@@ -45,7 +45,7 @@ enum Register {
     Cx,
     Dx,
     Bx,
-    Ap,
+    Sp,
     Bp,
     Si,
     Di,

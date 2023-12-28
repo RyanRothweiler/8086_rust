@@ -59,7 +59,7 @@ fn decode_register(input: u8, w_set: bool) -> Register {
             0b0100_0000 => Register::Dx,
             0b0110_0000 => Register::Bx,
 
-            0b1000_0000 => Register::Ap,
+            0b1000_0000 => Register::Sp,
             0b1010_0000 => Register::Bp,
             0b1100_0000 => Register::Si,
             0b1110_0000 => Register::Di,
@@ -69,14 +69,14 @@ fn decode_register(input: u8, w_set: bool) -> Register {
     } else {
         match input {
             0b0000_0000 => Register::Al,
-            0b0001_0000 => Register::Cl,
-            0b0010_0000 => Register::Dl,
-            0b0011_0000 => Register::Bl,
+            0b0010_0000 => Register::Cl,
+            0b0100_0000 => Register::Dl,
+            0b0110_0000 => Register::Bl,
 
-            0b0100_0000 => Register::Ah,
-            0b0101_0000 => Register::Ch,
-            0b0110_0000 => Register::Dh,
-            0b0111_0000 => Register::Bh,
+            0b1000_0000 => Register::Ah,
+            0b1010_0000 => Register::Ch,
+            0b1100_0000 => Register::Dh,
+            0b1110_0000 => Register::Bh,
 
             _ => panic!("Unknown register encoding"),
         }
