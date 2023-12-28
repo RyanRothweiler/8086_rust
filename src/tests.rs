@@ -1,23 +1,21 @@
 use super::*;
 
-#[test]
-fn register_to_register() {
-    //mov cx, bx
-    let mut asm: Vec<u8> = Vec::new();
-    asm.push(137);
-    asm.push(217);
-
-    let mut asm = Asm {
-        list: asm,
-        index: 0,
-    };
-
-    let command = parser::pull_command(&mut asm).expect("Error pulling command");
-    let truth = Command {
-        instruction: Instruction::Mov,
-        source: Register::Bx,
-        dest: Register::Cx,
-    };
+fn validate_next_command(truth: Command, asm: &mut Asm) {
+    let command = parser::pull_command(asm).expect("Error pulling command");
     assert_eq!(command, truth);
 }
 
+#[test]
+fn register_to_register() {
+    //mov cx, bx
+    let mut asm = Asm::new("resources/listings/listing_0037_single_register_mov");
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            source: Register::Bx,
+            dest: Register::Cx,
+        },
+        &mut asm,
+    );
+}

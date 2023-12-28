@@ -18,16 +18,9 @@ fn main() {
         return;
     }
 
-    let mut asm = Asm {
-        list: vec![],
-        index: 0,
-    };
-
     // load file
-    {
-        let file_path = &args[1];
-        asm.list = std::fs::read(file_path).expect(&format!("Error reading file {file_path}"));
-    }
+    let file_path = &args[1];
+    let mut asm = Asm::new(file_path);
 
     // parse instructions
     loop {
@@ -89,6 +82,17 @@ struct Asm {
 }
 
 impl Asm {
+    fn new(file_path: &str) -> Asm {
+        let mut asm = Asm {
+            list: vec![],
+            index: 0,
+        };
+
+        asm.list = std::fs::read(file_path).expect(&format!("Error reading file {file_path}"));
+
+        asm
+    }
+
     fn pull_byte(&mut self) -> Option<&u8> {
         let ret = self.list.get(self.index);
         self.index += 1;
@@ -96,4 +100,3 @@ impl Asm {
         ret
     }
 }
-
