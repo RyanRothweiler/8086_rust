@@ -6,108 +6,186 @@ fn validate_next_command(truth: Command, asm: &mut Asm) {
 }
 
 #[test]
-fn register_to_register() {
+fn listing_0037() {
     let mut asm = Asm::new("resources/listings/listing_0037_single_register_mov");
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Bx,
-            dest: Register::Cx,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Bx,
+                    dest: Register::Cx,
+                }
+            ),
         },
         &mut asm,
     );
 }
 
 #[test]
-fn register_to_register_all() {
+fn listing_0038() {
     let mut asm = Asm::new("resources/listings/listing_0038_many_register_mov");
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Bx,
-            dest: Register::Cx,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Bx,
+                    dest: Register::Cx,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Ah,
-            dest: Register::Ch,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Ah,
+                    dest: Register::Ch,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Bx,
-            dest: Register::Dx,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Bx,
+                    dest: Register::Dx,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Bx,
-            dest: Register::Si,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Bx,
+                    dest: Register::Si,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Di,
-            dest: Register::Bx,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Di,
+                    dest: Register::Bx,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Cl,
-            dest: Register::Al,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Cl,
+                    dest: Register::Al,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Ch,
-            dest: Register::Ch,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Ch,
+                    dest: Register::Ch,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Ax,
-            dest: Register::Bx,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Ax,
+                    dest: Register::Bx,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Si,
-            dest: Register::Bx,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Si,
+                    dest: Register::Bx,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Di,
-            dest: Register::Sp,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Di,
+                    dest: Register::Sp,
+                }
+            ),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            source: Register::Ax,
-            dest: Register::Bp,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Ax,
+                    dest: Register::Bp,
+                }
+            ),
+        },
+        &mut asm,
+    );
+}
+
+#[test]
+fn listing_0039() {
+    let mut asm = Asm::new("resources/listings/listing_0039_more_movs");
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Bx,
+                    dest: Register::Si,
+                }
+            ),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(
+                RegMemToRegMem {
+                    source: Register::Al,
+                    dest: Register::Dh,
+                }
+            ),
         },
         &mut asm,
     );
 
+    todo!("test unfinished");
 }

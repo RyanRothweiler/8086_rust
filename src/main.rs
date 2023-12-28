@@ -1,11 +1,11 @@
 use std::env;
 
-const MOV_REG_MEM: u8 = 0b_1000_1000;
 
 #[cfg(test)]
 #[allow(unused_variables, dead_code)]
 mod tests;
 
+#[allow(unused_variables, dead_code)]
 mod parser;
 
 #[allow(unused_variables)]
@@ -40,7 +40,7 @@ enum Instruction {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Register {
-    None,
+    //None,
     Ax,
     Cx,
     Dx,
@@ -60,19 +60,45 @@ enum Register {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct Command {
-    instruction: Instruction,
+struct RegMemToRegMem {
     source: Register,
     dest: Register,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct ImmeidateToRegMem {
+    immediate: u16,
+    dest: Register,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Encoding {
+    None,
+    RegMemToRegMem(RegMemToRegMem),
+    _ImmediateToRegMem(ImmeidateToRegMem),
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct Command {
+    instruction: Instruction,
+    encoding: Encoding,
 }
 
 impl Command {
     fn print(&self) {
         let instruction = format!("{:?}", self.instruction).to_lowercase();
-        let dest = format!("{:?}", self.dest).to_lowercase();
-        let source = format!("{:?}", self.source).to_lowercase();
+        print!("{instruction}");
 
-        println!("{instruction} {dest}, {source}");
+        match &self.encoding {
+            Encoding::RegMemToRegMem(data) => {
+                let dest = format!("{:?}", data.dest).to_lowercase();
+                let source = format!("{:?}", data.source).to_lowercase();
+                println!("{dest}, {source}");
+            },
+            _ => { panic!("Unknown encoding");},
+        }
+
+
     }
 }
 
