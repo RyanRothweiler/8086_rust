@@ -3,6 +3,7 @@ use std::env;
 const MOV_REG_MEM: u8 = 0b_1000_1000;
 
 #[cfg(test)]
+#[allow(unused_variables, dead_code)]
 mod tests;
 
 mod parser;
@@ -38,13 +39,13 @@ fn main() {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 enum Instruction {
     None,
     Mov,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 enum Register {
     None,
     Ax,
@@ -65,6 +66,7 @@ enum Register {
     Bh,
 }
 
+#[derive(Debug, PartialEq, Eq)]
 struct Command {
     instruction: Instruction,
     source: Register,

@@ -13,19 +13,11 @@ fn register_to_register() {
     };
 
     let command = parser::pull_command(&mut asm).expect("Error pulling command");
-
-    match command.instruction {
-        Instruction::Mov => {}
-        _ => panic!("Incorrect instruction"),
-    }
-
-    match command.source {
-        Register::Bx => {}
-        _ => panic!("Incorrect source register"),
-    }
-
-    match command.dest {
-        Register::Cx => {}
-        _ => panic!("Incorrect dest register"),
-    }
+    let truth = Command {
+        instruction: Instruction::Mov,
+        source: Register::Bx,
+        dest: Register::Cx,
+    };
+    assert_eq!(command, truth);
 }
+
