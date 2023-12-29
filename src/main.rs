@@ -40,7 +40,7 @@ enum Instruction {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Register {
-    //None,
+    None,
     Ax,
     Cx,
     Dx,
@@ -66,7 +66,7 @@ struct RegMemToRegMem {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct ImmeidateToRegMem {
+struct ImmediateToReg {
     immediate: u16,
     dest: Register,
 }
@@ -75,7 +75,7 @@ struct ImmeidateToRegMem {
 enum Encoding {
     None,
     RegMemToRegMem(RegMemToRegMem),
-    _ImmediateToRegMem(ImmeidateToRegMem),
+    ImmediateToReg(ImmediateToReg),
 }
 
 #[derive(Debug, PartialEq, Eq)]

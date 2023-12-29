@@ -11,12 +11,10 @@ fn listing_0037() {
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Bx,
-                    dest: Register::Cx,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Bx,
+                dest: Register::Cx,
+            }),
         },
         &mut asm,
     );
@@ -28,132 +26,110 @@ fn listing_0038() {
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Bx,
-                    dest: Register::Cx,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Bx,
+                dest: Register::Cx,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Ah,
-                    dest: Register::Ch,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Ah,
+                dest: Register::Ch,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Bx,
-                    dest: Register::Dx,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Bx,
+                dest: Register::Dx,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Bx,
-                    dest: Register::Si,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Bx,
+                dest: Register::Si,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Di,
-                    dest: Register::Bx,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Di,
+                dest: Register::Bx,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Cl,
-                    dest: Register::Al,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Cl,
+                dest: Register::Al,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Ch,
-                    dest: Register::Ch,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Ch,
+                dest: Register::Ch,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Ax,
-                    dest: Register::Bx,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Ax,
+                dest: Register::Bx,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Si,
-                    dest: Register::Bx,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Si,
+                dest: Register::Bx,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Di,
-                    dest: Register::Sp,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Di,
+                dest: Register::Sp,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Ax,
-                    dest: Register::Bp,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Ax,
+                dest: Register::Bp,
+            }),
         },
         &mut asm,
     );
@@ -165,27 +141,83 @@ fn listing_0039() {
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Bx,
-                    dest: Register::Si,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Bx,
+                dest: Register::Si,
+            }),
         },
         &mut asm,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(
-                RegMemToRegMem {
-                    source: Register::Al,
-                    dest: Register::Dh,
-                }
-            ),
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Register::Al,
+                dest: Register::Dh,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                dest: Register::Cl,
+                immediate: 12,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                dest: Register::Ch,
+                immediate: 244,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                dest: Register::Cx,
+                immediate: 12,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                dest: Register::Cx,
+                immediate: 65524,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                dest: Register::Dx,
+                immediate: 3948,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                dest: Register::Dx,
+                immediate: 61588,
+            }),
         },
         &mut asm,
     );
 
-    todo!("test unfinished");
+
 }
