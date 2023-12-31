@@ -34,8 +34,9 @@ fn main() {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Instruction {
-    None,
+    //None,
     Mov,
+    Add,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -80,6 +81,12 @@ struct RegMemToRegMem {
 }
 
 #[derive(Debug, PartialEq, Eq)]
+struct ImmediateToRegMem {
+    immediate: u16,
+    dest: Address,
+}
+
+#[derive(Debug, PartialEq, Eq)]
 struct ImmediateToReg {
     immediate: u16,
     dest: Register,
@@ -87,9 +94,10 @@ struct ImmediateToReg {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Encoding {
-    None,
+    //None,
     RegMemToRegMem(RegMemToRegMem),
     ImmediateToReg(ImmediateToReg),
+    ImmediateToRegMem(ImmediateToRegMem),
 }
 
 #[derive(Debug, PartialEq, Eq)]

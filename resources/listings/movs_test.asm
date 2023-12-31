@@ -16,4 +16,4 @@
 
 bits 16
 
-mov dx, -3948
+add si, 2

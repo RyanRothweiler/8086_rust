@@ -331,3 +331,46 @@ fn listing_0039() {
         &mut asm,
     );
 }
+
+#[test]
+fn listing_0041() {
+    let mut asm = Asm::new("resources/listings/listing_0041_add_sub_cmp_jnz");
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Bx),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::Si,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Bx),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                dest: Register::Si,
+                immediate: 2,
+            }),
+        },
+        &mut asm,
+    );
+}
