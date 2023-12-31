@@ -288,7 +288,6 @@ fn listing_0039() {
         },
         &mut asm,
     );
-    /*
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
@@ -317,5 +316,18 @@ fn listing_0039() {
         },
         &mut asm,
     );
-    */
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+                source: Address::Register(Register::Ch),
+            }),
+        },
+        &mut asm,
+    );
 }

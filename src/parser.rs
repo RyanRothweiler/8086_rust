@@ -44,63 +44,33 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             let reg_val: u8 = (second_byte & reg_mask) << 2;
             let rm_val: u8 = (second_byte & rm_mask) << 5;
 
-            // handle destination
-            let dest_val: u8;
-            let source_val: u8;
-            if d_val {
-                dest_val = reg_val;
-                source_val = rm_val;
-            } else {
-                dest_val = rm_val;
-                source_val = reg_val;
-            }
-
-            //let data_reg: Address;
-            //let data_address_calc: Address;
-
+            /*
             println!("");
             println!("mod {mod_val:#8b}");
             println!("source {source_val:#8b}");
             println!("dest_val {dest_val:#8b}");
             println!("first_byte {first_byte:#8b}");
             println!("second_byte {second_byte:#8b}");
+            */
 
-            // file
-            // mov [bx + di], cx
-            //00  001  001
-            //mod reg  r/m
-
-            // mov [bp + si], cl
-            // first byte
-            // 1000_10 0 0
-            //
-            //
-            // second byte
-            // 00  001  010
-            // mod reg  r/m
-            //source 0010_0000
-            //dest   0100_0000
-
-            //first_byte 100010 1 1
-            //                  d w 
-            //second_byte 01  010  110
-            //            mod reg  r/m
+            let reg_address: Address;
+            let rm_address: Address;
 
             match mod_val {
                 // register to register
                 // mov si, bx
                 0b1100_0000 => {
-                    data.source = Address::Register(decode_register(source_val, w_val));
-                    data.dest = Address::Register(decode_register(dest_val, w_val));
+                    reg_address = Address::Register(decode_register(reg_val, w_val));
+                    rm_address = Address::Register(decode_register(rm_val, w_val));
                 }
 
                 // effective address calculation
                 0b0000_0000 => {
-                    data.dest = Address::Register(decode_register(dest_val, w_val));
+                    reg_address = Address::Register(decode_register(reg_val, w_val));
 
-                    match source_val {
+                    match rm_val {
                         0b0000_0000 => {
-                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                            rm_address = Address::EffectiveAddress(EffectiveAddress {
                                 first_operand: Register::Bx,
                                 second_operand: Register::Si,
                                 offset: 0,
@@ -108,7 +78,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                         }
 
                         0b0110_0000 => {
-                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                            rm_address = Address::EffectiveAddress(EffectiveAddress {
                                 first_operand: Register::Bp,
                                 second_operand: Register::Di,
                                 offset: 0,
@@ -116,9 +86,17 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                         }
 
                         0b0010_0000 => {
-                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                            rm_address = Address::EffectiveAddress(EffectiveAddress {
                                 first_operand: Register::Bx,
                                 second_operand: Register::Di,
+                                offset: 0,
+                            });
+                        }
+
+                        0b0100_0000 => {
+                            rm_address = Address::EffectiveAddress(EffectiveAddress {
+                                first_operand: Register::Bp,
+                                second_operand: Register::Si,
                                 offset: 0,
                             });
                         }
@@ -131,16 +109,16 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
 
                 // effective address calculation
                 0b0100_0000 => {
-                    data.dest = Address::Register(decode_register(dest_val, w_val));
+                    reg_address = Address::Register(decode_register(reg_val, w_val));
 
-                    match source_val {
+                    match rm_val {
                         0b0000_0000 => {
                             let low: u8 = match asm.pull_byte() {
                                 Some(v) => *v,
                                 None => return None,
                             };
 
-                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                            rm_address = Address::EffectiveAddress(EffectiveAddress {
                                 first_operand: Register::Bx,
                                 second_operand: Register::Si,
                                 offset: low as u16,
@@ -153,7 +131,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                                 None => return None,
                             };
 
-                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                            rm_address = Address::EffectiveAddress(EffectiveAddress {
                                 first_operand: Register::Bp,
                                 second_operand: Register::None,
                                 offset: offset as u16,
@@ -168,9 +146,9 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
 
                 // effective address calculation
                 0b1000_0000 => {
-                    data.dest = Address::Register(decode_register(dest_val, w_val));
+                    reg_address = Address::Register(decode_register(reg_val, w_val));
 
-                    match source_val {
+                    match rm_val {
                         0b0000_0000 => {
                             let low: u8 = match asm.pull_byte() {
                                 Some(v) => *v,
@@ -181,7 +159,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                                 None => return None,
                             };
 
-                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                            rm_address = Address::EffectiveAddress(EffectiveAddress {
                                 first_operand: Register::Bx,
                                 second_operand: Register::Si,
                                 offset: combine(low, high),
@@ -198,15 +176,14 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                 }
             };
 
-            /*
+            // handle source / dest swapping based on the d_val
             if d_val {
-                data.source = data_address_calc;
-                data.dest = data_reg;
+                data.source = rm_address;
+                data.dest = reg_address;
             } else {
-                data.source = data_reg;
-                data.dest = data_address_calc;
+                data.source = reg_address;
+                data.dest = rm_address;
             }
-            */
         }
 
         Encoding::ImmediateToReg(ref mut data) => {
