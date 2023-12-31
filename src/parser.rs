@@ -28,29 +28,77 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                 None => return None,
             };
 
-            let w_mask: u8 = 0b_0000_0001;
-            let mod_mask: u8 = 0b_1100_0000;
-            let first_reg_mask: u8 = 0b_0011_1000;
-            let second_reg_mask: u8 = 0b_0000_0111;
+            // first byte
+            let w_mask: u8 = 0b0000_0001;
+            let d_mask: u8 = 0b0000_0010;
 
             let w_val: bool = (first_byte & w_mask) == 1;
+            let d_val: bool = ((first_byte & d_mask) >> 1) == 1;
+
+            // second byte
+            let mod_mask: u8 = 0b1100_0000;
+            let reg_mask: u8 = 0b0011_1000;
+            let rm_mask: u8 =  0b0000_0111;
+
             let mod_val: u8 = second_byte & mod_mask;
-            let reg_val: u8 = (second_byte & first_reg_mask) << 2;
-            let rm_val: u8 = (second_byte & second_reg_mask) << 5;
+            let reg_val: u8 = (second_byte & reg_mask) << 2;
+            let rm_val: u8 = (second_byte & rm_mask) << 5;
+
+            // handle destination
+            let dest_val: u8;
+            let source_val: u8;
+            if d_val {
+                dest_val = reg_val;
+                source_val = rm_val;
+            } else {
+                dest_val = rm_val;
+                source_val = reg_val;
+            }
+
+            //let data_reg: Address;
+            //let data_address_calc: Address;
+
+            println!("");
+            println!("mod {mod_val:#8b}");
+            println!("source {source_val:#8b}");
+            println!("dest_val {dest_val:#8b}");
+            println!("first_byte {first_byte:#8b}");
+            println!("second_byte {second_byte:#8b}");
+
+            // file
+            // mov [bx + di], cx
+            //00  001  001
+            //mod reg  r/m
+
+            // mov [bp + si], cl
+            // first byte
+            // 1000_10 0 0
+            //
+            //
+            // second byte
+            // 00  001  010
+            // mod reg  r/m
+            //source 0010_0000
+            //dest   0100_0000
+
+            //first_byte 100010 1 1
+            //                  d w 
+            //second_byte 01  010  110
+            //            mod reg  r/m
 
             match mod_val {
                 // register to register
                 // mov si, bx
                 0b1100_0000 => {
-                    data.source = Address::Register(decode_register(reg_val, w_val));
-                    data.dest = Address::Register(decode_register(rm_val, w_val));
+                    data.source = Address::Register(decode_register(source_val, w_val));
+                    data.dest = Address::Register(decode_register(dest_val, w_val));
                 }
 
-                // effective address calculatio
+                // effective address calculation
                 0b0000_0000 => {
-                    data.dest = Address::Register(decode_register(reg_val, w_val));
+                    data.dest = Address::Register(decode_register(dest_val, w_val));
 
-                    match rm_val {
+                    match source_val {
                         0b0000_0000 => {
                             data.source = Address::EffectiveAddress(EffectiveAddress {
                                 first_operand: Register::Bx,
@@ -66,17 +114,26 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                                 offset: 0,
                             });
                         }
+
+                        0b0010_0000 => {
+                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                                first_operand: Register::Bx,
+                                second_operand: Register::Di,
+                                offset: 0,
+                            });
+                        }
+
                         _ => {
-                            panic!("Unkown effective address calculation");
+                            panic!("Unknown effective address source val");
                         }
                     };
                 }
 
                 // effective address calculation
                 0b0100_0000 => {
-                    data.dest = Address::Register(decode_register(reg_val, w_val));
+                    data.dest = Address::Register(decode_register(dest_val, w_val));
 
-                    match rm_val {
+                    match source_val {
                         0b0000_0000 => {
                             let low: u8 = match asm.pull_byte() {
                                 Some(v) => *v,
@@ -89,6 +146,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                                 offset: low as u16,
                             });
                         }
+
                         0b1100_0000 => {
                             let offset: u8 = match asm.pull_byte() {
                                 Some(v) => *v,
@@ -101,17 +159,18 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                                 offset: offset as u16,
                             });
                         }
+
                         _ => {
-                            panic!("Unkown rm value")
+                            panic!("Unknown effective address source val");
                         }
                     };
                 }
 
                 // effective address calculation
                 0b1000_0000 => {
-                    data.dest = Address::Register(decode_register(reg_val, w_val));
+                    data.dest = Address::Register(decode_register(dest_val, w_val));
 
-                    match rm_val {
+                    match source_val {
                         0b0000_0000 => {
                             let low: u8 = match asm.pull_byte() {
                                 Some(v) => *v,
@@ -128,8 +187,9 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                                 offset: combine(low, high),
                             });
                         }
+
                         _ => {
-                            panic!("Unknown rm value");
+                            panic!("Unknown effective address source val");
                         }
                     };
                 }
@@ -137,6 +197,16 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                     panic!("Unknown mod value");
                 }
             };
+
+            /*
+            if d_val {
+                data.source = data_address_calc;
+                data.dest = data_reg;
+            } else {
+                data.source = data_reg;
+                data.dest = data_address_calc;
+            }
+            */
         }
 
         Encoding::ImmediateToReg(ref mut data) => {

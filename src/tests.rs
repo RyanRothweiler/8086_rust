@@ -59,7 +59,7 @@ fn listing_0038() {
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 source: Address::Register(Register::Bx),
                 dest: Address::Register(Register::Si),
-            }), 
+            }),
         },
         &mut asm,
     );
@@ -288,4 +288,34 @@ fn listing_0039() {
         },
         &mut asm,
     );
+    /*
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::Di,
+                    offset: 0,
+                }),
+                source: Address::Register(Register::Cx),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::Si,
+                    offset: 0,
+                }),
+                source: Address::Register(Register::Cl),
+            }),
+        },
+        &mut asm,
+    );
+    */
 }
