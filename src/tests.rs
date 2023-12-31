@@ -12,8 +12,8 @@ fn listing_0037() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Bx,
-                dest: Register::Cx,
+                source: Address::Register(Register::Bx),
+                dest: Address::Register(Register::Cx),
             }),
         },
         &mut asm,
@@ -27,8 +27,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Bx,
-                dest: Register::Cx,
+                source: Address::Register(Register::Bx),
+                dest: Address::Register(Register::Cx),
             }),
         },
         &mut asm,
@@ -37,8 +37,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Ah,
-                dest: Register::Ch,
+                source: Address::Register(Register::Ah),
+                dest: Address::Register(Register::Ch),
             }),
         },
         &mut asm,
@@ -47,8 +47,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Bx,
-                dest: Register::Dx,
+                source: Address::Register(Register::Bx),
+                dest: Address::Register(Register::Dx),
             }),
         },
         &mut asm,
@@ -57,8 +57,18 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Bx,
-                dest: Register::Si,
+                source: Address::Register(Register::Bx),
+                dest: Address::Register(Register::Si),
+            }), 
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Address::Register(Register::Di),
+                dest: Address::Register(Register::Bx),
             }),
         },
         &mut asm,
@@ -67,8 +77,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Di,
-                dest: Register::Bx,
+                source: Address::Register(Register::Cl),
+                dest: Address::Register(Register::Al),
             }),
         },
         &mut asm,
@@ -77,8 +87,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Cl,
-                dest: Register::Al,
+                source: Address::Register(Register::Ch),
+                dest: Address::Register(Register::Ch),
             }),
         },
         &mut asm,
@@ -87,8 +97,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Ch,
-                dest: Register::Ch,
+                source: Address::Register(Register::Ax),
+                dest: Address::Register(Register::Bx),
             }),
         },
         &mut asm,
@@ -97,8 +107,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Ax,
-                dest: Register::Bx,
+                source: Address::Register(Register::Si),
+                dest: Address::Register(Register::Bx),
             }),
         },
         &mut asm,
@@ -107,8 +117,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Si,
-                dest: Register::Bx,
+                source: Address::Register(Register::Di),
+                dest: Address::Register(Register::Sp),
             }),
         },
         &mut asm,
@@ -117,18 +127,8 @@ fn listing_0038() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Di,
-                dest: Register::Sp,
-            }),
-        },
-        &mut asm,
-    );
-    validate_next_command(
-        Command {
-            instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Ax,
-                dest: Register::Bp,
+                source: Address::Register(Register::Ax),
+                dest: Address::Register(Register::Bp),
             }),
         },
         &mut asm,
@@ -142,8 +142,8 @@ fn listing_0039() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Bx,
-                dest: Register::Si,
+                source: Address::Register(Register::Bx),
+                dest: Address::Register(Register::Si),
             }),
         },
         &mut asm,
@@ -152,8 +152,8 @@ fn listing_0039() {
         Command {
             instruction: Instruction::Mov,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Register::Al,
-                dest: Register::Dh,
+                source: Address::Register(Register::Al),
+                dest: Address::Register(Register::Dh),
             }),
         },
         &mut asm,
@@ -218,6 +218,74 @@ fn listing_0039() {
         },
         &mut asm,
     );
-
-
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Al),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::Si,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Bx),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::Di,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Dx),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Ah),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::Si,
+                    offset: 4,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Al),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::Si,
+                    offset: 4999,
+                }),
+            }),
+        },
+        &mut asm,
+    );
 }

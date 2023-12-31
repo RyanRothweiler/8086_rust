@@ -35,13 +35,108 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
 
             let w_val: bool = (first_byte & w_mask) == 1;
             let mod_val: u8 = second_byte & mod_mask;
-            let first_reg: u8 = (second_byte & first_reg_mask) << 2;
-            let second_reg: u8 = (second_byte & second_reg_mask) << 5;
+            let reg_val: u8 = (second_byte & first_reg_mask) << 2;
+            let rm_val: u8 = (second_byte & second_reg_mask) << 5;
 
-            assert!(mod_val == 0b1100_0000, "Unknown mod value");
+            match mod_val {
+                // register to register
+                // mov si, bx
+                0b1100_0000 => {
+                    data.source = Address::Register(decode_register(reg_val, w_val));
+                    data.dest = Address::Register(decode_register(rm_val, w_val));
+                }
 
-            data.source = decode_register(first_reg, w_val);
-            data.dest = decode_register(second_reg, w_val);
+                // effective address calculatio
+                0b0000_0000 => {
+                    data.dest = Address::Register(decode_register(reg_val, w_val));
+
+                    match rm_val {
+                        0b0000_0000 => {
+                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                                first_operand: Register::Bx,
+                                second_operand: Register::Si,
+                                offset: 0,
+                            });
+                        }
+
+                        0b0110_0000 => {
+                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                                first_operand: Register::Bp,
+                                second_operand: Register::Di,
+                                offset: 0,
+                            });
+                        }
+                        _ => {
+                            panic!("Unkown effective address calculation");
+                        }
+                    };
+                }
+
+                // effective address calculation
+                0b0100_0000 => {
+                    data.dest = Address::Register(decode_register(reg_val, w_val));
+
+                    match rm_val {
+                        0b0000_0000 => {
+                            let low: u8 = match asm.pull_byte() {
+                                Some(v) => *v,
+                                None => return None,
+                            };
+
+                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                                first_operand: Register::Bx,
+                                second_operand: Register::Si,
+                                offset: low as u16,
+                            });
+                        }
+                        0b1100_0000 => {
+                            let offset: u8 = match asm.pull_byte() {
+                                Some(v) => *v,
+                                None => return None,
+                            };
+
+                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                                first_operand: Register::Bp,
+                                second_operand: Register::None,
+                                offset: offset as u16,
+                            });
+                        }
+                        _ => {
+                            panic!("Unkown rm value")
+                        }
+                    };
+                }
+
+                // effective address calculation
+                0b1000_0000 => {
+                    data.dest = Address::Register(decode_register(reg_val, w_val));
+
+                    match rm_val {
+                        0b0000_0000 => {
+                            let low: u8 = match asm.pull_byte() {
+                                Some(v) => *v,
+                                None => return None,
+                            };
+                            let high: u8 = match asm.pull_byte() {
+                                Some(v) => *v,
+                                None => return None,
+                            };
+
+                            data.source = Address::EffectiveAddress(EffectiveAddress {
+                                first_operand: Register::Bx,
+                                second_operand: Register::Si,
+                                offset: combine(low, high),
+                            });
+                        }
+                        _ => {
+                            panic!("Unknown rm value");
+                        }
+                    };
+                }
+                _ => {
+                    panic!("Unknown mod value");
+                }
+            };
         }
 
         Encoding::ImmediateToReg(ref mut data) => {
@@ -65,21 +160,8 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
                     Some(v) => *v,
                     None => return None,
                 };
-                
-                let low : u16 =  (second_byte as u16);
-                let high : u16 =  (third_byte as u16) << 8;
-                let num : u16 = high | low;
 
-                println!("second    {second_byte:#8b}");
-                println!("third     {third_byte:#8b}");
-
-                println!("low       {low:#16b}");
-                println!("high      {high:#16b}");
-
-                println!("num       {num:#16b} {num}");
-                println!("");
-
-                data.immediate = num;
+                data.immediate = combine(second_byte, third_byte);
             } else {
                 data.immediate = second_byte as u16;
             }
@@ -93,11 +175,19 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
     Some(ret)
 }
 
+fn combine(low: u8, high: u8) -> u16 {
+    let low: u16 = low as u16;
+    let high: u16 = (high as u16) << 8;
+    let num: u16 = high | low;
+
+    return num;
+}
+
 fn get_encoding(byte: u8) -> Encoding {
     if (byte & 0b_1111_1100) == MOV_REG_MEM {
         return Encoding::RegMemToRegMem(RegMemToRegMem {
-            source: Register::None,
-            dest: Register::None,
+            source: Address::Register(Register::None),
+            dest: Address::Register(Register::None),
         });
     } else if (byte & 0b1111_0000) == 0b1011_0000 {
         return Encoding::ImmediateToReg(ImmediateToReg {

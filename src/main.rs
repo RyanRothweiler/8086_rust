@@ -60,9 +60,23 @@ enum Register {
 }
 
 #[derive(Debug, PartialEq, Eq)]
+struct EffectiveAddress {
+    first_operand : Register,
+    second_operand : Register,
+    offset : u16,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Address {
+    //None,
+    Register(Register),
+    EffectiveAddress(EffectiveAddress),
+}
+
+#[derive(Debug, PartialEq, Eq)]
 struct RegMemToRegMem {
-    source: Register,
-    dest: Register,
+    source: Address,
+    dest: Address,
 }
 
 #[derive(Debug, PartialEq, Eq)]
