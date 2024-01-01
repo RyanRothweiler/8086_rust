@@ -32,11 +32,13 @@ fn main() {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 enum Instruction {
-    //None,
+    None,
     Mov,
     Add,
+    Sub,
+    Cmp
 }
 
 #[derive(Debug, PartialEq, Eq)]

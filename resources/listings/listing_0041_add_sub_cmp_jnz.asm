@@ -57,7 +57,7 @@ sub [bx + 2], cx
 sub [bp + si + 4], bh
 sub [bp + di + 6], di
 sub byte [bx], 34
-sub word [bx + di], 29
+sub word [bp + si + 1000], 29
 sub ax, [bp]
 sub al, [bx + si]
 sub ax, bx
@@ -82,7 +82,7 @@ cmp [bx + 2], cx
 cmp [bp + si + 4], bh
 cmp [bp + di + 6], di
 cmp byte [bx], 34
-cmp word [4834], 29
+cmp word [bp + si + 1000], 29
 cmp ax, [bp]
 cmp al, [bx + si]
 cmp ax, bx

@@ -332,12 +332,11 @@ fn listing_0039() {
     );
 }
 
-#[test]
-fn listing_0041() {
-    let mut asm = Asm::new("resources/listings/listing_0041_add_sub_cmp_jnz");
+// the same commands are used for add / sub / cmp
+fn test_list(instruction: Instruction, asm: &mut Asm) {
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Bx),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -347,11 +346,11 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Bx),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -361,41 +360,41 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
                 dest: Address::Register(Register::Si),
                 immediate: 2,
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
                 dest: Address::Register(Register::Bp),
                 immediate: 2,
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
                 dest: Address::Register(Register::Cx),
                 immediate: 8,
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Bx),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -405,11 +404,11 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Cx),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -419,11 +418,11 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Bh),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -433,11 +432,11 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Di),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -447,11 +446,11 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bx,
@@ -461,11 +460,11 @@ fn listing_0041() {
                 source: Address::Register(Register::Bx),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bp,
@@ -475,11 +474,11 @@ fn listing_0041() {
                 source: Address::Register(Register::Bx),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bp,
@@ -489,11 +488,11 @@ fn listing_0041() {
                 source: Address::Register(Register::Bx),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bx,
@@ -503,11 +502,11 @@ fn listing_0041() {
                 source: Address::Register(Register::Cx),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bp,
@@ -517,11 +516,11 @@ fn listing_0041() {
                 source: Address::Register(Register::Bh),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bp,
@@ -531,11 +530,11 @@ fn listing_0041() {
                 source: Address::Register(Register::Di),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bx,
@@ -545,11 +544,11 @@ fn listing_0041() {
                 immediate: 34,
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
                 dest: Address::EffectiveAddress(EffectiveAddress {
                     first_operand: Register::Bp,
@@ -559,11 +558,11 @@ fn listing_0041() {
                 immediate: 29,
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Ax),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -573,11 +572,11 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Al),
                 source: Address::EffectiveAddress(EffectiveAddress {
@@ -587,57 +586,64 @@ fn listing_0041() {
                 }),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Ax),
                 source: Address::Register(Register::Bx),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 dest: Address::Register(Register::Al),
                 source: Address::Register(Register::Ah),
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
                 dest: Register::Ax,
                 immediate: 1000,
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
                 dest: Register::Al,
                 immediate: 226,
             }),
         },
-        &mut asm,
+        asm,
     );
     validate_next_command(
         Command {
-            instruction: Instruction::Add,
+            instruction: instruction.clone(),
             encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
                 dest: Register::Al,
                 immediate: 9,
             }),
         },
-        &mut asm,
+        asm,
     );
+}
 
+#[test]
+fn listing_0041() {
+    let mut asm = Asm::new("resources/listings/listing_0041_add_sub_cmp_jnz");
+    test_list(Instruction::Add, &mut asm);
+    test_list(Instruction::Sub, &mut asm);
+    test_list(Instruction::Cmp, &mut asm);
 }

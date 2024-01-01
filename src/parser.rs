@@ -117,23 +117,42 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             // second byte
             let rm_mask: u8 = 0b0000_0111;
             let mod_mask: u8 = 0b1100_0000;
+            let operation_mask: u8 = 0b00111_000;
 
             let rm_val: u8 = (second_byte & rm_mask) << 5;
             let mod_val: u8 = second_byte & mod_mask;
+            let operation_val: u8 = (second_byte & operation_mask) << 2;
+
+            // set operation
+            match operation_val {
+                0b0000_0000 => {
+                    ret.instruction = Instruction::Add;
+                }
+
+                0b1010_0000 => {
+                    ret.instruction = Instruction::Sub;
+                }
+
+                0b1110_0000 => {
+                    ret.instruction = Instruction::Cmp;
+                }
+
+                _ => {
+                    panic!("Unknown operation");
+                }
+            }
 
             // get results
             let mod_results = match handle_mod(mod_val, 0, rm_val, w_val, asm) {
                 Some(v) => v,
                 None => return None,
             };
-
             data.dest = mod_results.rm_address;
 
             let data_first: u8 = match asm.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };
-
             data.immediate = data_first as u16;
         }
 
@@ -428,20 +447,40 @@ fn handle_mod(
 fn get_command(byte: u8) -> Command {
     const MOV_REG_MEM: u8 = 0b_1000_1000;
     const ADD_REG_MEM: u8 = 0b_0000_0000;
+    const SUB_REG_MEM: u8 = 0b_0010_1000;
+    const CMP_REG_MEM: u8 = 0b_0011_1000;
     const REG_MEM_TO_REG_MEM_MASK: u8 = 0b_1111_1100;
 
     const MOV_IMMEDIATE_REG: u8 = 0b_1011_0000;
     const IMMEDIATE_REG_MASK: u8 = 0b_1111_0000;
 
-    const ADD_IMMEDIATE_REG_MEM: u8 = 0b_1000_0000;
-    const ADD_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
+    const ASC_IMMEDIATE_REG_MEM: u8 = 0b_1000_0000;
+    const ASC_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
 
     const ADD_IMMEDIATE_ACCUMULATOR: u8 = 0b_0000_0100;
-    const ADD_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
+    const SUB_IMMEDIATE_ACCUMULATOR: u8 = 0b_0010_1100;
+    const CMP_IMMEDIATE_ACCUMULATOR: u8 = 0b_0011_1100;
+    const ASC_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
 
     if (byte & REG_MEM_TO_REG_MEM_MASK) == MOV_REG_MEM {
         return Command {
             instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Address::Register(Register::None),
+                dest: Address::Register(Register::None),
+            }),
+        };
+    } else if (byte & REG_MEM_TO_REG_MEM_MASK) == SUB_REG_MEM {
+        return Command {
+            instruction: Instruction::Sub,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Address::Register(Register::None),
+                dest: Address::Register(Register::None),
+            }),
+        };
+    } else if (byte & REG_MEM_TO_REG_MEM_MASK) == CMP_REG_MEM {
+        return Command {
+            instruction: Instruction::Cmp,
             encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
                 source: Address::Register(Register::None),
                 dest: Address::Register(Register::None),
@@ -455,17 +494,34 @@ fn get_command(byte: u8) -> Command {
                 dest: Address::Register(Register::None),
             }),
         };
-    } else if (byte & ADD_IMMEDIATE_ACCUMULATOR_MASK) == ADD_IMMEDIATE_ACCUMULATOR {
+    } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == ADD_IMMEDIATE_ACCUMULATOR {
         return Command {
             instruction: Instruction::Add,
-            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator{
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
                 dest: Register::None,
                 immediate: 0,
             }),
         };
-    } else if (byte & ADD_IMMEDIATE_REG_MEM_MASK) == ADD_IMMEDIATE_REG_MEM {
+    } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == SUB_IMMEDIATE_ACCUMULATOR {
         return Command {
-            instruction: Instruction::Add,
+            instruction: Instruction::Sub,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                dest: Register::None,
+                immediate: 0,
+            }),
+        };
+    } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == CMP_IMMEDIATE_ACCUMULATOR {
+        return Command {
+            instruction: Instruction::Cmp,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                dest: Register::None,
+                immediate: 0,
+            }),
+        };
+    } else if (byte & ASC_IMMEDIATE_REG_MEM_MASK) == ASC_IMMEDIATE_REG_MEM {
+        // The instruction must be determined by processing the second byte
+        return Command {
+            instruction: Instruction::None,
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
                 immediate: 0,
                 dest: Address::Register(Register::None),
@@ -481,7 +537,7 @@ fn get_command(byte: u8) -> Command {
         };
     }
 
-    panic!("Unkown instruction");
+    panic!("Unkown instruction {byte:#8b}");
 }
 
 fn decode_register(input: u8, w_set: bool) -> Register {
