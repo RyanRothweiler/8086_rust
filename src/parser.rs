@@ -444,6 +444,12 @@ fn handle_mod(
     Some(results)
 }
 
+struct _CommandMask {
+    mask: u8,
+    instruction_value: u8,
+    command: Command,
+} 
+
 fn get_command(byte: u8) -> Command {
     const MOV_REG_MEM: u8 = 0b_1000_1000;
     const ADD_REG_MEM: u8 = 0b_0000_0000;
@@ -465,75 +471,48 @@ fn get_command(byte: u8) -> Command {
     if (byte & REG_MEM_TO_REG_MEM_MASK) == MOV_REG_MEM {
         return Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Address::Register(Register::None),
-                dest: Address::Register(Register::None),
-            }),
+            encoding: Encoding::new_reg_mem_to_reg_mem(),
         };
     } else if (byte & REG_MEM_TO_REG_MEM_MASK) == SUB_REG_MEM {
         return Command {
             instruction: Instruction::Sub,
-            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Address::Register(Register::None),
-                dest: Address::Register(Register::None),
-            }),
+            encoding: Encoding::new_reg_mem_to_reg_mem(),
         };
     } else if (byte & REG_MEM_TO_REG_MEM_MASK) == CMP_REG_MEM {
         return Command {
             instruction: Instruction::Cmp,
-            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Address::Register(Register::None),
-                dest: Address::Register(Register::None),
-            }),
+            encoding: Encoding::new_reg_mem_to_reg_mem(),
         };
     } else if (byte & REG_MEM_TO_REG_MEM_MASK) == ADD_REG_MEM {
         return Command {
             instruction: Instruction::Add,
-            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
-                source: Address::Register(Register::None),
-                dest: Address::Register(Register::None),
-            }),
+            encoding: Encoding::new_reg_mem_to_reg_mem(),
         };
     } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == ADD_IMMEDIATE_ACCUMULATOR {
         return Command {
             instruction: Instruction::Add,
-            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
-                dest: Register::None,
-                immediate: 0,
-            }),
+            encoding: Encoding::new_immediate_to_accumulator(),
         };
     } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == SUB_IMMEDIATE_ACCUMULATOR {
         return Command {
             instruction: Instruction::Sub,
-            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
-                dest: Register::None,
-                immediate: 0,
-            }),
+            encoding: Encoding::new_immediate_to_accumulator(),
         };
     } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == CMP_IMMEDIATE_ACCUMULATOR {
         return Command {
             instruction: Instruction::Cmp,
-            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
-                dest: Register::None,
-                immediate: 0,
-            }),
+            encoding: Encoding::new_immediate_to_accumulator(),
         };
     } else if (byte & ASC_IMMEDIATE_REG_MEM_MASK) == ASC_IMMEDIATE_REG_MEM {
         // The instruction must be determined by processing the second byte
         return Command {
             instruction: Instruction::None,
-            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
-                immediate: 0,
-                dest: Address::Register(Register::None),
-            }),
+            encoding: Encoding::new_immediate_to_reg_mem(),
         };
     } else if (byte & IMMEDIATE_REG_MASK) == MOV_IMMEDIATE_REG {
         return Command {
             instruction: Instruction::Mov,
-            encoding: Encoding::ImmediateToReg(ImmediateToReg {
-                immediate: 0,
-                dest: Register::None,
-            }),
+            encoding: Encoding::new_immediate_to_reg(),
         };
     }
 

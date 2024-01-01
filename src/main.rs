@@ -1,6 +1,5 @@
 use std::env;
 
-
 #[cfg(test)]
 #[allow(unused_variables, dead_code)]
 mod tests;
@@ -38,7 +37,7 @@ enum Instruction {
     Mov,
     Add,
     Sub,
-    Cmp
+    Cmp,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -64,9 +63,9 @@ enum Register {
 
 #[derive(Debug, PartialEq, Eq)]
 struct EffectiveAddress {
-    first_operand : Register,
-    second_operand : Register,
-    offset : u16,
+    first_operand: Register,
+    second_operand: Register,
+    offset: u16,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -82,10 +81,28 @@ struct RegMemToRegMem {
     dest: Address,
 }
 
+impl RegMemToRegMem {
+    fn new() -> RegMemToRegMem {
+        RegMemToRegMem {
+            source: Address::Register(Register::None),
+            dest: Address::Register(Register::None),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 struct ImmediateToRegMem {
     immediate: u16,
     dest: Address,
+}
+
+impl ImmediateToRegMem {
+    fn new() -> ImmediateToRegMem {
+        ImmediateToRegMem {
+            immediate: 0,
+            dest: Address::Register(Register::None),
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -94,10 +111,28 @@ struct ImmediateToReg {
     dest: Register,
 }
 
+impl ImmediateToReg {
+    fn new() -> ImmediateToReg {
+        ImmediateToReg {
+            immediate: 0,
+            dest: Register::None,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 struct ImmediateToAccumulator {
     dest: Register,
     immediate: u16,
+}
+
+impl ImmediateToAccumulator {
+    fn new() -> ImmediateToAccumulator {
+        ImmediateToAccumulator {
+            dest: Register::None,
+            immediate: 0,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -107,6 +142,24 @@ enum Encoding {
     ImmediateToReg(ImmediateToReg),
     ImmediateToRegMem(ImmediateToRegMem),
     ImmediateToAccumulator(ImmediateToAccumulator),
+}
+
+impl Encoding {
+    fn new_reg_mem_to_reg_mem() -> Encoding {
+        Encoding::RegMemToRegMem(RegMemToRegMem::new())
+    }
+
+    fn new_immediate_to_reg() -> Encoding {
+        Encoding::ImmediateToReg(ImmediateToReg::new())
+    }
+
+    fn new_immediate_to_reg_mem() -> Encoding {
+        Encoding::ImmediateToRegMem(ImmediateToRegMem::new())
+    }
+
+    fn new_immediate_to_accumulator() -> Encoding {
+        Encoding::ImmediateToAccumulator(ImmediateToAccumulator::new())
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -125,11 +178,11 @@ impl Command {
                 let dest = format!("{:?}", data.dest).to_lowercase();
                 let source = format!("{:?}", data.source).to_lowercase();
                 println!("{dest}, {source}");
-            },
-            _ => { panic!("Unknown encoding");},
+            }
+            _ => {
+                panic!("Unknown encoding");
+            }
         }
-
-
     }
 }
 
