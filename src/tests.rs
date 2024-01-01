@@ -366,11 +366,278 @@ fn listing_0041() {
     validate_next_command(
         Command {
             instruction: Instruction::Add,
-            encoding: Encoding::ImmediateToReg(ImmediateToReg {
-                dest: Register::Si,
+            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
+                dest: Address::Register(Register::Si),
                 immediate: 2,
             }),
         },
         &mut asm,
     );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
+                dest: Address::Register(Register::Bp),
+                immediate: 2,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
+                dest: Address::Register(Register::Cx),
+                immediate: 8,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Bx),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Cx),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::None,
+                    offset: 2,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Bh),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::Si,
+                    offset: 4,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Di),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::Di,
+                    offset: 6,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::Si,
+                    offset: 0,
+                }),
+                source: Address::Register(Register::Bx),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+                source: Address::Register(Register::Bx),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+                source: Address::Register(Register::Bx),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::None,
+                    offset: 2,
+                }),
+                source: Address::Register(Register::Cx),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::Si,
+                    offset: 4,
+                }),
+                source: Address::Register(Register::Bh),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::Di,
+                    offset: 6,
+                }),
+                source: Address::Register(Register::Di),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+                immediate: 34,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
+                dest: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::Si,
+                    offset: 1000,
+                }),
+                immediate: 29,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Ax),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bp,
+                    second_operand: Register::None,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Al),
+                source: Address::EffectiveAddress(EffectiveAddress {
+                    first_operand: Register::Bx,
+                    second_operand: Register::Si,
+                    offset: 0,
+                }),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Ax),
+                source: Address::Register(Register::Bx),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                dest: Address::Register(Register::Al),
+                source: Address::Register(Register::Ah),
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                dest: Register::Ax,
+                immediate: 1000,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                dest: Register::Al,
+                immediate: 226,
+            }),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                dest: Register::Al,
+                immediate: 9,
+            }),
+        },
+        &mut asm,
+    );
+
 }

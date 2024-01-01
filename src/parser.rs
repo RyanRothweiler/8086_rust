@@ -10,6 +10,33 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
     let mut ret: Command = get_command(first_byte);
 
     match ret.encoding {
+        Encoding::ImmediateToAccumulator(ref mut data) => {
+            let w_mask: u8 = 0b0000_0001;
+            let w_val: bool = (first_byte & w_mask) == 1;
+
+            if !w_val {
+                data.dest = Register::Al;
+
+                let second_byte: u8 = match asm.pull_byte() {
+                    Some(v) => *v,
+                    None => return None,
+                };
+                data.immediate = second_byte as u16
+            } else {
+                data.dest = Register::Ax;
+
+                let second_byte: u8 = match asm.pull_byte() {
+                    Some(v) => *v,
+                    None => return None,
+                };
+                let third_byte: u8 = match asm.pull_byte() {
+                    Some(v) => *v,
+                    None => return None,
+                };
+                data.immediate = combine(second_byte, third_byte);
+            }
+        }
+
         Encoding::RegMemToRegMem(ref mut data) => {
             let second_byte: u8 = match asm.pull_byte() {
                 Some(v) => *v,
@@ -32,20 +59,12 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             let reg_val: u8 = (second_byte & reg_mask) << 2;
             let rm_val: u8 = (second_byte & rm_mask) << 5;
 
-            /*
-            println!("");
-            println!("mod {mod_val:#8b}");
-            println!("source {source_val:#8b}");
-            println!("dest_val {dest_val:#8b}");
-            println!("first_byte {first_byte:#8b}");
-            println!("second_byte {second_byte:#8b}");
-            */
-
+            // get results
             let mod_results = match handle_mod(mod_val, reg_val, rm_val, w_val, asm) {
                 Some(v) => v,
                 None => return None,
             };
-            
+
             // handle source / dest swapping based on the d_val
             if d_val {
                 data.source = mod_results.rm_address;
@@ -95,22 +114,27 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             let w_val: bool = (first_byte & w_mask) == 1;
             let s_val: bool = ((first_byte & s_mask) >> 1) == 1;
 
-            assert!(s_val, "Invalid s_val");
-
             // second byte
-            let reg_mask: u8 = 0b0000_0111;
+            let rm_mask: u8 = 0b0000_0111;
             let mod_mask: u8 = 0b1100_0000;
 
-            let reg_val: u8 = (second_byte & reg_mask) << 5;
-            let mod_val: u8 = first_byte & reg_mask;
+            let rm_val: u8 = (second_byte & rm_mask) << 5;
+            let mod_val: u8 = second_byte & mod_mask;
 
             // get results
-            let mod_results = match handle_mod(mod_val, reg_val, 0, w_val, asm) {
+            let mod_results = match handle_mod(mod_val, 0, rm_val, w_val, asm) {
                 Some(v) => v,
                 None => return None,
             };
 
-            //data.dest = mod_results.
+            data.dest = mod_results.rm_address;
+
+            let data_first: u8 = match asm.pull_byte() {
+                Some(v) => *v,
+                None => return None,
+            };
+
+            data.immediate = data_first as u16;
         }
 
         _ => {
@@ -121,7 +145,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
     Some(ret)
 }
 
-// combine two 8 bits into one 16 bit 
+// combine two 8 bits into one 16 bit
 fn combine(low: u8, high: u8) -> u16 {
     let low: u16 = low as u16;
     let high: u16 = (high as u16) << 8;
@@ -148,6 +172,13 @@ fn handle_mod(
         rm_address: Address::Register(Register::None),
     };
 
+    /*
+    println!("mod {mod_val:#8b}");
+    println!("reg {reg_val:#8b}");
+    println!("rm  {rm_val:#8b}");
+    println!("");
+    */
+
     match mod_val {
         // register to register
         // mov si, bx
@@ -169,14 +200,6 @@ fn handle_mod(
                     });
                 }
 
-                0b0110_0000 => {
-                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
-                        first_operand: Register::Bp,
-                        second_operand: Register::Di,
-                        offset: 0,
-                    });
-                }
-
                 0b0010_0000 => {
                     results.rm_address = Address::EffectiveAddress(EffectiveAddress {
                         first_operand: Register::Bx,
@@ -193,6 +216,38 @@ fn handle_mod(
                     });
                 }
 
+                0b0110_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bp,
+                        second_operand: Register::Di,
+                        offset: 0,
+                    });
+                }
+
+                0b1000_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Si,
+                        second_operand: Register::None,
+                        offset: 0,
+                    });
+                }
+
+                0b1010_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Di,
+                        second_operand: Register::None,
+                        offset: 0,
+                    });
+                }
+
+                0b1110_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bx,
+                        second_operand: Register::None,
+                        offset: 0,
+                    });
+                }
+
                 _ => {
                     panic!("Unknown effective address source val");
                 }
@@ -202,29 +257,71 @@ fn handle_mod(
         // effective address calculation
         0b0100_0000 => {
             results.reg_address = Address::Register(decode_register(reg_val, w_val));
+            let offset: u8 = match asm.pull_byte() {
+                Some(v) => *v,
+                None => return None,
+            };
 
             match rm_val {
                 0b0000_0000 => {
-                    let low: u8 = match asm.pull_byte() {
-                        Some(v) => *v,
-                        None => return None,
-                    };
-
                     results.rm_address = Address::EffectiveAddress(EffectiveAddress {
                         first_operand: Register::Bx,
                         second_operand: Register::Si,
-                        offset: low as u16,
+                        offset: offset as u16,
+                    });
+                }
+
+                0b0010_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bx,
+                        second_operand: Register::Di,
+                        offset: offset as u16,
+                    });
+                }
+
+                0b0100_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bp,
+                        second_operand: Register::Si,
+                        offset: offset as u16,
+                    });
+                }
+
+                0b0110_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bp,
+                        second_operand: Register::Di,
+                        offset: offset as u16,
+                    });
+                }
+
+                0b1000_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Si,
+                        second_operand: Register::None,
+                        offset: offset as u16,
+                    });
+                }
+
+                0b1010_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Di,
+                        second_operand: Register::None,
+                        offset: offset as u16,
                     });
                 }
 
                 0b1100_0000 => {
-                    let offset: u8 = match asm.pull_byte() {
-                        Some(v) => *v,
-                        None => return None,
-                    };
-
                     results.rm_address = Address::EffectiveAddress(EffectiveAddress {
                         first_operand: Register::Bp,
+                        second_operand: Register::None,
+                        offset: offset as u16,
+                    });
+                }
+
+                0b1110_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bx,
                         second_operand: Register::None,
                         offset: offset as u16,
                     });
@@ -239,22 +336,79 @@ fn handle_mod(
         // effective address calculation
         0b1000_0000 => {
             results.reg_address = Address::Register(decode_register(reg_val, w_val));
+            let low: u8 = match asm.pull_byte() {
+                Some(v) => *v,
+                None => return None,
+            };
+            let high: u8 = match asm.pull_byte() {
+                Some(v) => *v,
+                None => return None,
+            };
+
+            let offset = combine(low, high);
 
             match rm_val {
                 0b0000_0000 => {
-                    let low: u8 = match asm.pull_byte() {
-                        Some(v) => *v,
-                        None => return None,
-                    };
-                    let high: u8 = match asm.pull_byte() {
-                        Some(v) => *v,
-                        None => return None,
-                    };
-
                     results.rm_address = Address::EffectiveAddress(EffectiveAddress {
                         first_operand: Register::Bx,
                         second_operand: Register::Si,
-                        offset: combine(low, high),
+                        offset: offset,
+                    });
+                }
+
+                0b0010_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bx,
+                        second_operand: Register::Di,
+                        offset: offset,
+                    });
+                }
+
+                0b0100_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bp,
+                        second_operand: Register::Si,
+                        offset: offset,
+                    });
+                }
+
+                0b0110_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bp,
+                        second_operand: Register::Di,
+                        offset: offset,
+                    });
+                }
+
+                0b1000_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Si,
+                        second_operand: Register::None,
+                        offset: offset,
+                    });
+                }
+
+                0b1010_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Di,
+                        second_operand: Register::None,
+                        offset: offset,
+                    });
+                }
+
+                0b1100_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bp,
+                        second_operand: Register::None,
+                        offset: offset,
+                    });
+                }
+
+                0b1110_0000 => {
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::Bx,
+                        second_operand: Register::None,
+                        offset: offset,
                     });
                 }
 
@@ -280,7 +434,10 @@ fn get_command(byte: u8) -> Command {
     const IMMEDIATE_REG_MASK: u8 = 0b_1111_0000;
 
     const ADD_IMMEDIATE_REG_MEM: u8 = 0b_1000_0000;
-    const IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_0000;
+    const ADD_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
+
+    const ADD_IMMEDIATE_ACCUMULATOR: u8 = 0b_0000_0100;
+    const ADD_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
 
     if (byte & REG_MEM_TO_REG_MEM_MASK) == MOV_REG_MEM {
         return Command {
@@ -298,7 +455,15 @@ fn get_command(byte: u8) -> Command {
                 dest: Address::Register(Register::None),
             }),
         };
-    } else if (byte & IMMEDIATE_REG_MEM_MASK) == ADD_IMMEDIATE_REG_MEM {
+    } else if (byte & ADD_IMMEDIATE_ACCUMULATOR_MASK) == ADD_IMMEDIATE_ACCUMULATOR {
+        return Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator{
+                dest: Register::None,
+                immediate: 0,
+            }),
+        };
+    } else if (byte & ADD_IMMEDIATE_REG_MEM_MASK) == ADD_IMMEDIATE_REG_MEM {
         return Command {
             instruction: Instruction::Add,
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {

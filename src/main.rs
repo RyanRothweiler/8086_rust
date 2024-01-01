@@ -93,11 +93,18 @@ struct ImmediateToReg {
 }
 
 #[derive(Debug, PartialEq, Eq)]
+struct ImmediateToAccumulator {
+    dest: Register,
+    immediate: u16,
+}
+
+#[derive(Debug, PartialEq, Eq)]
 enum Encoding {
     //None,
     RegMemToRegMem(RegMemToRegMem),
     ImmediateToReg(ImmediateToReg),
     ImmediateToRegMem(ImmediateToRegMem),
+    ImmediateToAccumulator(ImmediateToAccumulator),
 }
 
 #[derive(Debug, PartialEq, Eq)]
