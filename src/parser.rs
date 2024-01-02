@@ -465,7 +465,159 @@ const ASC_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
 const ASC_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
 const JMP_MASK: u8 = 0b_1111_1111;
 
-static COMMAND_MASKS: [CommandMask; 10] = [
+static COMMAND_MASKS: [CommandMask; 29] = [
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_1110_0011,
+        command: Command {
+            instruction: Instruction::Jcxz,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_1110_0000,
+        command: Command {
+            instruction: Instruction::Loopnz,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_1110_0001,
+        command: Command {
+            instruction: Instruction::Loopz,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_1110_0010,
+        command: Command {
+            instruction: Instruction::Loop,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1001,
+        command: Command {
+            instruction: Instruction::Jns,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0001,
+        command: Command {
+            instruction: Instruction::Jno,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1011,
+        command: Command {
+            instruction: Instruction::Jnp,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0111,
+        command: Command {
+            instruction: Instruction::Ja,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0011,
+        command: Command {
+            instruction: Instruction::Jnb,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1111,
+        command: Command {
+            instruction: Instruction::Jg,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1101,
+        command: Command {
+            instruction: Instruction::Jnl,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1000,
+        command: Command {
+            instruction: Instruction::Js,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0000,
+        command: Command {
+            instruction: Instruction::Jo,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1010,
+        command: Command {
+            instruction: Instruction::Jp,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0110,
+        command: Command {
+            instruction: Instruction::Jbe,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0010,
+        command: Command {
+            instruction: Instruction::Jb,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1110,
+        command: Command {
+            instruction: Instruction::Jle,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_1100,
+        command: Command {
+            instruction: Instruction::Jl,
+            encoding: Encoding::Jump(0),
+        },
+    },
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0100,
+        command: Command {
+            instruction: Instruction::Je,
+            encoding: Encoding::Jump(0),
+        },
+    },
     CommandMask {
         mask: JMP_MASK,
         instruction_value: 0b_0111_0101,

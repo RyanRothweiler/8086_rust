@@ -675,6 +675,158 @@ fn listing_0041() {
         },
         &mut asm,
     );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Je,
+            encoding: Encoding::Jump(-2),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jl,
+            encoding: Encoding::Jump(-4),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jle,
+            encoding: Encoding::Jump(-6),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jb,
+            encoding: Encoding::Jump(-8),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jbe,
+            encoding: Encoding::Jump(-10),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jp,
+            encoding: Encoding::Jump(-12),
+        },
+        &mut asm,
+    );
 
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jo,
+            encoding: Encoding::Jump(-14),
+        },
+        &mut asm,
+    );
 
+    validate_next_command(
+        Command {
+            instruction: Instruction::Js,
+            encoding: Encoding::Jump(-16),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnz,
+            encoding: Encoding::Jump(-18),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnl,
+            encoding: Encoding::Jump(-20),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jg,
+            encoding: Encoding::Jump(-22),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnb,
+            encoding: Encoding::Jump(-24),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Ja,
+            encoding: Encoding::Jump(-26),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnp,
+            encoding: Encoding::Jump(-28),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jno,
+            encoding: Encoding::Jump(-30),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jns,
+            encoding: Encoding::Jump(-32),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Loop,
+            encoding: Encoding::Jump(-34),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Loopz,
+            encoding: Encoding::Jump(-36),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Loopnz,
+            encoding: Encoding::Jump(-38),
+        },
+        &mut asm,
+    );
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jcxz,
+            encoding: Encoding::Jump(-40),
+        },
+        &mut asm,
+    );
 }
