@@ -10,6 +10,15 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
     let mut ret: Command = get_command(first_byte);
 
     match ret.encoding {
+        Encoding::Jump(ref mut data) => {
+            let second_byte: u8 = match asm.pull_byte() {
+                Some(v) => *v,
+                None => return None,
+            };
+
+            *data = second_byte as i8;
+        }
+
         Encoding::ImmediateToAccumulator(ref mut data) => {
             let w_mask: u8 = 0b0000_0001;
             let w_val: bool = (first_byte & w_mask) == 1;
@@ -454,8 +463,17 @@ const REG_MEM_TO_REG_MEM_MASK: u8 = 0b_1111_1100;
 const IMMEDIATE_REG_MASK: u8 = 0b_1111_0000;
 const ASC_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
 const ASC_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
+const JMP_MASK: u8 = 0b_1111_1111;
 
-static COMMAND_MASKS: [CommandMask; 9] = [
+static COMMAND_MASKS: [CommandMask; 10] = [
+    CommandMask {
+        mask: JMP_MASK,
+        instruction_value: 0b_0111_0101,
+        command: Command {
+            instruction: Instruction::Jnz,
+            encoding: Encoding::Jump(0),
+        },
+    },
     CommandMask {
         mask: ASC_IMMEDIATE_ACCUMULATOR_MASK,
         instruction_value: 0b_0000_0100,
@@ -489,7 +507,6 @@ static COMMAND_MASKS: [CommandMask; 9] = [
             }),
         },
     },
-
     CommandMask {
         mask: IMMEDIATE_REG_MASK,
         instruction_value: 0b_1011_0000,

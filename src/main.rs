@@ -39,6 +39,7 @@ enum Instruction {
     Add,
     Sub,
     Cmp,
+    Jnz,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -144,6 +145,7 @@ enum Encoding {
     ImmediateToReg(ImmediateToReg),
     ImmediateToRegMem(ImmediateToRegMem),
     ImmediateToAccumulator(ImmediateToAccumulator),
+    Jump(i8),
 }
 
 #[allow(dead_code)]

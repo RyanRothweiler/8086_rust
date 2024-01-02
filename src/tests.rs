@@ -646,4 +646,35 @@ fn listing_0041() {
     test_list(Instruction::Add, &mut asm);
     test_list(Instruction::Sub, &mut asm);
     test_list(Instruction::Cmp, &mut asm);
+
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnz,
+            encoding: Encoding::Jump(2),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnz,
+            encoding: Encoding::Jump(-4),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnz,
+            encoding: Encoding::Jump(-6),
+        },
+        &mut asm,
+    );
+    validate_next_command(
+        Command {
+            instruction: Instruction::Jnz,
+            encoding: Encoding::Jump(-4),
+        },
+        &mut asm,
+    );
+
+
 }
