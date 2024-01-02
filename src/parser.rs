@@ -444,78 +444,126 @@ fn handle_mod(
     Some(results)
 }
 
-struct _CommandMask {
+struct CommandMask {
     mask: u8,
     instruction_value: u8,
     command: Command,
-} 
+}
+
+const REG_MEM_TO_REG_MEM_MASK: u8 = 0b_1111_1100;
+const IMMEDIATE_REG_MASK: u8 = 0b_1111_0000;
+const ASC_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
+const ASC_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
+
+static COMMAND_MASKS: [CommandMask; 9] = [
+    CommandMask {
+        mask: ASC_IMMEDIATE_ACCUMULATOR_MASK,
+        instruction_value: 0b_0000_0100,
+        command: Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                immediate: 0,
+                dest: Register::None,
+            }),
+        },
+    },
+    CommandMask {
+        mask: ASC_IMMEDIATE_ACCUMULATOR_MASK,
+        instruction_value: 0b_0010_1100,
+        command: Command {
+            instruction: Instruction::Sub,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                immediate: 0,
+                dest: Register::None,
+            }),
+        },
+    },
+    CommandMask {
+        mask: ASC_IMMEDIATE_ACCUMULATOR_MASK,
+        instruction_value: 0b_0011_1100,
+        command: Command {
+            instruction: Instruction::Cmp,
+            encoding: Encoding::ImmediateToAccumulator(ImmediateToAccumulator {
+                immediate: 0,
+                dest: Register::None,
+            }),
+        },
+    },
+
+    CommandMask {
+        mask: IMMEDIATE_REG_MASK,
+        instruction_value: 0b_1011_0000,
+        command: Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToReg(ImmediateToReg {
+                immediate: 0,
+                dest: Register::None,
+            }),
+        },
+    },
+    CommandMask {
+        mask: ASC_IMMEDIATE_REG_MEM_MASK,
+        instruction_value: 0b_1000_0000,
+        command: Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
+                immediate: 0,
+                dest: Address::Register(Register::None),
+            }),
+        },
+    },
+    CommandMask {
+        mask: REG_MEM_TO_REG_MEM_MASK,
+        instruction_value: 0b_1000_1000,
+        command: Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Address::Register(Register::None),
+                dest: Address::Register(Register::None),
+            }),
+        },
+    },
+    CommandMask {
+        mask: REG_MEM_TO_REG_MEM_MASK,
+        instruction_value: 0b_0000_0000,
+        command: Command {
+            instruction: Instruction::Add,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Address::Register(Register::None),
+                dest: Address::Register(Register::None),
+            }),
+        },
+    },
+    CommandMask {
+        mask: REG_MEM_TO_REG_MEM_MASK,
+        instruction_value: 0b_0010_1000,
+        command: Command {
+            instruction: Instruction::Sub,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Address::Register(Register::None),
+                dest: Address::Register(Register::None),
+            }),
+        },
+    },
+    CommandMask {
+        mask: REG_MEM_TO_REG_MEM_MASK,
+        instruction_value: 0b_0011_1000,
+        command: Command {
+            instruction: Instruction::Cmp,
+            encoding: Encoding::RegMemToRegMem(RegMemToRegMem {
+                source: Address::Register(Register::None),
+                dest: Address::Register(Register::None),
+            }),
+        },
+    },
+];
 
 fn get_command(byte: u8) -> Command {
-    const MOV_REG_MEM: u8 = 0b_1000_1000;
-    const ADD_REG_MEM: u8 = 0b_0000_0000;
-    const SUB_REG_MEM: u8 = 0b_0010_1000;
-    const CMP_REG_MEM: u8 = 0b_0011_1000;
-    const REG_MEM_TO_REG_MEM_MASK: u8 = 0b_1111_1100;
-
-    const MOV_IMMEDIATE_REG: u8 = 0b_1011_0000;
-    const IMMEDIATE_REG_MASK: u8 = 0b_1111_0000;
-
-    const ASC_IMMEDIATE_REG_MEM: u8 = 0b_1000_0000;
-    const ASC_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
-
-    const ADD_IMMEDIATE_ACCUMULATOR: u8 = 0b_0000_0100;
-    const SUB_IMMEDIATE_ACCUMULATOR: u8 = 0b_0010_1100;
-    const CMP_IMMEDIATE_ACCUMULATOR: u8 = 0b_0011_1100;
-    const ASC_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
-
-    if (byte & REG_MEM_TO_REG_MEM_MASK) == MOV_REG_MEM {
-        return Command {
-            instruction: Instruction::Mov,
-            encoding: Encoding::new_reg_mem_to_reg_mem(),
-        };
-    } else if (byte & REG_MEM_TO_REG_MEM_MASK) == SUB_REG_MEM {
-        return Command {
-            instruction: Instruction::Sub,
-            encoding: Encoding::new_reg_mem_to_reg_mem(),
-        };
-    } else if (byte & REG_MEM_TO_REG_MEM_MASK) == CMP_REG_MEM {
-        return Command {
-            instruction: Instruction::Cmp,
-            encoding: Encoding::new_reg_mem_to_reg_mem(),
-        };
-    } else if (byte & REG_MEM_TO_REG_MEM_MASK) == ADD_REG_MEM {
-        return Command {
-            instruction: Instruction::Add,
-            encoding: Encoding::new_reg_mem_to_reg_mem(),
-        };
-    } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == ADD_IMMEDIATE_ACCUMULATOR {
-        return Command {
-            instruction: Instruction::Add,
-            encoding: Encoding::new_immediate_to_accumulator(),
-        };
-    } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == SUB_IMMEDIATE_ACCUMULATOR {
-        return Command {
-            instruction: Instruction::Sub,
-            encoding: Encoding::new_immediate_to_accumulator(),
-        };
-    } else if (byte & ASC_IMMEDIATE_ACCUMULATOR_MASK) == CMP_IMMEDIATE_ACCUMULATOR {
-        return Command {
-            instruction: Instruction::Cmp,
-            encoding: Encoding::new_immediate_to_accumulator(),
-        };
-    } else if (byte & ASC_IMMEDIATE_REG_MEM_MASK) == ASC_IMMEDIATE_REG_MEM {
-        // The instruction must be determined by processing the second byte
-        return Command {
-            instruction: Instruction::None,
-            encoding: Encoding::new_immediate_to_reg_mem(),
-        };
-    } else if (byte & IMMEDIATE_REG_MASK) == MOV_IMMEDIATE_REG {
-        return Command {
-            instruction: Instruction::Mov,
-            encoding: Encoding::new_immediate_to_reg(),
-        };
+    for c_mask in &COMMAND_MASKS {
+        if (byte & c_mask.mask) == c_mask.instruction_value {
+            return c_mask.command.clone();
+        }
     }
-
     panic!("Unkown instruction {byte:#8b}");
 }
 

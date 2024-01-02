@@ -32,6 +32,7 @@ fn main() {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
+#[allow(dead_code)]
 enum Instruction {
     None,
     Mov,
@@ -40,7 +41,7 @@ enum Instruction {
     Cmp,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 enum Register {
     None,
     Ax,
@@ -61,26 +62,27 @@ enum Register {
     Bh,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct EffectiveAddress {
     first_operand: Register,
     second_operand: Register,
     offset: u16,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 enum Address {
     //None,
     Register(Register),
     EffectiveAddress(EffectiveAddress),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct RegMemToRegMem {
     source: Address,
     dest: Address,
 }
 
+#[allow(dead_code)]
 impl RegMemToRegMem {
     fn new() -> RegMemToRegMem {
         RegMemToRegMem {
@@ -90,7 +92,7 @@ impl RegMemToRegMem {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct ImmediateToRegMem {
     immediate: u16,
     dest: Address,
@@ -105,7 +107,7 @@ impl ImmediateToRegMem {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct ImmediateToReg {
     immediate: u16,
     dest: Register,
@@ -120,7 +122,7 @@ impl ImmediateToReg {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct ImmediateToAccumulator {
     dest: Register,
     immediate: u16,
@@ -135,7 +137,7 @@ impl ImmediateToAccumulator {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 enum Encoding {
     //None,
     RegMemToRegMem(RegMemToRegMem),
@@ -144,6 +146,7 @@ enum Encoding {
     ImmediateToAccumulator(ImmediateToAccumulator),
 }
 
+#[allow(dead_code)]
 impl Encoding {
     fn new_reg_mem_to_reg_mem() -> Encoding {
         Encoding::RegMemToRegMem(RegMemToRegMem::new())
@@ -162,7 +165,7 @@ impl Encoding {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct Command {
     instruction: Instruction,
     encoding: Encoding,
