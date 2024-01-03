@@ -7,6 +7,14 @@ mod tests;
 #[allow(unused_variables, dead_code)]
 mod parser;
 
+mod asm;
+mod command;
+mod encoding;
+
+use asm::*;
+use command::*;
+use encoding::*;
+
 #[allow(unused_variables)]
 #[allow(dead_code)]
 fn main() {
@@ -82,155 +90,3 @@ enum Register {
     Bh,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-struct EffectiveAddress {
-    first_operand: Register,
-    second_operand: Register,
-    offset: u16,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-enum Address {
-    //None,
-    Register(Register),
-    EffectiveAddress(EffectiveAddress),
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-struct RegMemToRegMem {
-    source: Address,
-    dest: Address,
-}
-
-#[allow(dead_code)]
-impl RegMemToRegMem {
-    fn new() -> RegMemToRegMem {
-        RegMemToRegMem {
-            source: Address::Register(Register::None),
-            dest: Address::Register(Register::None),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-struct ImmediateToRegMem {
-    immediate: u16,
-    dest: Address,
-}
-
-impl ImmediateToRegMem {
-    fn new() -> ImmediateToRegMem {
-        ImmediateToRegMem {
-            immediate: 0,
-            dest: Address::Register(Register::None),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-struct ImmediateToReg {
-    immediate: u16,
-    dest: Register,
-}
-
-impl ImmediateToReg {
-    fn new() -> ImmediateToReg {
-        ImmediateToReg {
-            immediate: 0,
-            dest: Register::None,
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-struct ImmediateToAccumulator {
-    dest: Register,
-    immediate: u16,
-}
-
-impl ImmediateToAccumulator {
-    fn new() -> ImmediateToAccumulator {
-        ImmediateToAccumulator {
-            dest: Register::None,
-            immediate: 0,
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-enum Encoding {
-    //None,
-    RegMemToRegMem(RegMemToRegMem),
-    ImmediateToReg(ImmediateToReg),
-    ImmediateToRegMem(ImmediateToRegMem),
-    ImmediateToAccumulator(ImmediateToAccumulator),
-    Jump(i8),
-}
-
-#[allow(dead_code)]
-impl Encoding {
-    fn new_reg_mem_to_reg_mem() -> Encoding {
-        Encoding::RegMemToRegMem(RegMemToRegMem::new())
-    }
-
-    fn new_immediate_to_reg() -> Encoding {
-        Encoding::ImmediateToReg(ImmediateToReg::new())
-    }
-
-    fn new_immediate_to_reg_mem() -> Encoding {
-        Encoding::ImmediateToRegMem(ImmediateToRegMem::new())
-    }
-
-    fn new_immediate_to_accumulator() -> Encoding {
-        Encoding::ImmediateToAccumulator(ImmediateToAccumulator::new())
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-struct Command {
-    instruction: Instruction,
-    encoding: Encoding,
-}
-
-impl Command {
-    fn print(&self) {
-        let instruction = format!("{:?}", self.instruction).to_lowercase();
-        print!("{instruction}");
-
-        match &self.encoding {
-            Encoding::RegMemToRegMem(data) => {
-                let dest = format!("{:?}", data.dest).to_lowercase();
-                let source = format!("{:?}", data.source).to_lowercase();
-                println!("{dest}, {source}");
-            }
-            _ => {
-                panic!("Unknown encoding");
-            }
-        }
-    }
-}
-
-struct Asm {
-    list: Vec<u8>,
-    index: usize,
-}
-
-impl Asm {
-    fn new(file_path: &str) -> Asm {
-        let mut asm = Asm {
-            list: vec![],
-            index: 0,
-        };
-
-        asm.list = std::fs::read(file_path).expect(&format!("Error reading file {file_path}"));
-
-        asm
-    }
-
-    fn pull_byte(&mut self) -> Option<&u8> {
-        let ret = self.list.get(self.index);
-        self.index += 1;
-
-        ret
-    }
-}
