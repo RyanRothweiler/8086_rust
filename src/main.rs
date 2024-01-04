@@ -1,15 +1,13 @@
 use std::env;
 
 #[cfg(test)]
-#[allow(unused_variables, dead_code)]
 mod tests;
-
-#[allow(unused_variables, dead_code)]
-mod parser;
 
 mod asm;
 mod command;
 mod encoding;
+mod parser;
+mod simulator;
 
 use asm::*;
 use command::*;
@@ -72,21 +70,24 @@ enum Instruction {
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum Register {
     None,
+
     Ax,
+    Bx,
     Cx,
     Dx,
-    Bx,
+
     Sp,
     Bp,
     Si,
     Di,
+
     Al,
+    Bl,
     Cl,
     Dl,
-    Bl,
+
     Ah,
+    Bh,
     Ch,
     Dh,
-    Bh,
 }
-

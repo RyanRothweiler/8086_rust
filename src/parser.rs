@@ -1,3 +1,5 @@
+#![allow(unused_variables, dead_code)]
+
 use crate::*;
 
 #[allow(unreachable_patterns)]
