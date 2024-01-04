@@ -2,19 +2,9 @@ use crate::simulator::tests::*;
 
 #[test]
 fn listing_0043() {
-    let mut asm = Asm::new("resources/listings/listing_0043_immediate_movs");
     let mut cpu = Cpu::new();
 
-    // parse instructions
-    loop {
-        let command = parser::pull_command(&mut asm);
-        let command = match command {
-            Some(v) => v,
-            None => break,
-        };
-
-        simulate(&mut cpu, command);
-    }
+    full_simulate("resources/listings/listing_0043_immediate_movs", &mut cpu);
 
     assert!(cpu.a == 1);
     assert!(cpu.b == 2);

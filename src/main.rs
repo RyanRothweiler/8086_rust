@@ -1,5 +1,7 @@
 use std::env;
 
+use std::io::stdin;
+
 mod asm;
 mod command;
 mod encoding;
@@ -23,14 +25,22 @@ fn main() {
     // load file
     let file_path = &args[1];
     let mut asm = Asm::new(file_path);
+    let mut cpu = simulator::Cpu::new();
 
     // parse instructions
     loop {
+
         let command = parser::pull_command(&mut asm);
-        match command {
-            Some(v) => v.print(),
+        let command = match command {
+            Some(v) => v,
             None => break,
-        }
+        };
+
+        cpu.simulate(command);
+        cpu.print();
+
+        let mut s = String::new();
+        stdin().read_line(&mut s).unwrap();
     }
 }
 
