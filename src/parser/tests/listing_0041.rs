@@ -1,4 +1,4 @@
-use crate::tests::*;
+use crate::parser::tests::*;
 
 // the same commands are used for add / sub / cmp
 fn test_list(instruction: Instruction, asm: &mut Asm) {

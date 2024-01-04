@@ -1,8 +1,5 @@
 use std::env;
 
-#[cfg(test)]
-mod tests;
-
 mod asm;
 mod command;
 mod encoding;

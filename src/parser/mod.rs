@@ -2,6 +2,9 @@
 
 use crate::*;
 
+#[cfg(test)]
+mod tests;
+
 #[allow(unreachable_patterns)]
 pub fn pull_command(asm: &mut Asm) -> Option<Command> {
     let first_byte: u8 = match asm.pull_byte() {
