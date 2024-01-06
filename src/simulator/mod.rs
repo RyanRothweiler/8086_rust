@@ -5,14 +5,17 @@ use crate::*;
 mod tests;
 
 pub struct Cpu {
-    a: u16,
-    b: u16,
-    c: u16,
-    d: u16,
-    sp: u16,
-    bp: u16,
-    si: u16,
-    di: u16,
+    a: i16,
+    b: i16,
+    c: i16,
+    d: i16,
+    sp: i16,
+    bp: i16,
+    si: i16,
+    di: i16,
+
+    signed_flag: bool,
+    zero_flag: bool,
 }
 
 impl Cpu {
@@ -26,11 +29,15 @@ impl Cpu {
             bp: 0,
             si: 0,
             di: 0,
+
+            signed_flag: false,
+            zero_flag: false,
         }
     }
 
     pub fn print(&self) {
         println!("--------------------");
+        println!("REG-----------------");
         println!("a  {}", self.a);
         println!("b  {}", self.b);
         println!("c  {}", self.c);
@@ -39,46 +46,94 @@ impl Cpu {
         println!("bp {}", self.bp);
         println!("si {}", self.si);
         println!("di {}", self.di);
-        println!("--------------------");
+        println!("FLAGS----------------");
+        println!("signed {}", self.signed_flag);
+        println!("zero   {}", self.zero_flag);
+        println!("---------------------");
     }
 
     pub fn simulate(&mut self, command: Command) {
-        match command.instruction {
-            Instruction::Mov => match command.encoding {
-                Encoding::ImmediateToReg(data) => {
-                    self.set_register(data.dest, data.immediate);
+        match command.encoding {
+            Encoding::ImmediateToReg(data) => {
+                self.set_register(&data.dest, data.immediate as i16);
+            }
+
+            Encoding::ImmediateToRegMem(reg_mem) => {
+                let dest: Register = match reg_mem.dest {
+                    Address::Register(d) => d,
+                    _ => {
+                        panic!("Unimplemented address")
+                    }
+                };
+
+                match command.instruction {
+                    Instruction::Mov => {
+                        self.set_register(&dest, reg_mem.immediate as i16);
+                    }
+                    Instruction::Cmp => {
+                        let dest_val = self.get_value(&dest);
+                        self.update_flags(dest_val - reg_mem.immediate as i16);
+                    }
+                    Instruction::Sub => {
+                        self.sub(dest, reg_mem.immediate as i16);
+                    }
+                    Instruction::Add => {
+                        self.add(dest, reg_mem.immediate as i16);
+                    }
+                    _ => {
+                        dbg!(command.instruction);
+                        panic!("Unknown instruction.");
+                    }
                 }
+            }
 
-                Encoding::RegMemToRegMem(reg_mem) => {
-                    let dest: Register = match reg_mem.dest {
-                        Address::Register(d) => d,
-                        _ => {
-                            panic!("Unimplemented address")
-                        }
-                    };
+            Encoding::RegMemToRegMem(reg_mem) => {
+                let dest: Register = match reg_mem.dest {
+                    Address::Register(d) => d,
+                    _ => {
+                        panic!("Unimplemented address")
+                    }
+                };
 
-                    let source: Register = match reg_mem.source {
-                        Address::Register(d) => d,
-                        _ => {
-                            panic!("Unimplemented address")
-                        }
-                    };
+                let source: Register = match reg_mem.source {
+                    Address::Register(d) => d,
+                    _ => {
+                        panic!("Unimplemented address")
+                    }
+                };
 
-                    let val = self.get_value(source);
-                    self.set_register(dest, val);
+                match command.instruction {
+                    Instruction::Mov => {
+                        let val = self.get_value(&source);
+                        self.set_register(&dest, val);
+                    }
+                    Instruction::Cmp => {
+                        let source_val = self.get_value(&source);
+                        let dest_val = self.get_value(&dest);
+                        self.update_flags(dest_val - source_val);
+                    }
+                    Instruction::Sub => {
+                        let source_val = self.get_value(&source);
+                        self.sub(dest, source_val);
+                    }
+                    Instruction::Add => {
+                        let source_val = self.get_value(&source);
+                        self.add(dest, source_val);
+                    }
+                    _ => {
+                        dbg!(command.instruction);
+                        panic!("Unknown instruction.");
+                    }
                 }
-                _ => {
-                    panic!("Unknwon mov encoding");
-                }
-            },
-
+            }
             _ => {
-                panic!("Unknown instruction");
+                dbg!(command.encoding);
+                panic!("Unknwon encoding");
             }
         }
     }
 
-    fn set_register(&mut self, reg: Register, val: u16) {
+    fn set_register(&mut self, reg: &Register, val: i16) {
         match reg {
             Register::Ax => self.a = val,
             Register::Bx => self.b = val,
@@ -94,7 +149,7 @@ impl Cpu {
         }
     }
 
-    fn get_value(&self, reg: Register) -> u16 {
+    fn get_value(&self, reg: &Register) -> i16 {
         match reg {
             Register::Ax => self.a,
             Register::Bx => self.b,
@@ -108,5 +163,24 @@ impl Cpu {
                 panic! {"Unknown register. Remove this eventually. Should be a compile error."};
             }
         }
+    }
+
+    fn update_flags(&mut self, val: i16) {
+        self.signed_flag = val < 0;
+        self.zero_flag = val == 0;
+    }
+
+    fn add(&mut self, dest: Register, value: i16) {
+        let curr: i16 = self.get_value(&dest);
+        let new_val = curr + value;
+        self.set_register(&dest, new_val);
+        self.update_flags(new_val);
+    }
+
+    fn sub(&mut self, dest: Register, value: i16) {
+        let curr: i16 = self.get_value(&dest);
+        let new_val = curr - value;
+        self.set_register(&dest, new_val);
+        self.update_flags(new_val);
     }
 }

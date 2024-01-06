@@ -163,11 +163,24 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             };
             data.dest = mod_results.rm_address;
 
-            let data_first: u8 = match asm.pull_byte() {
-                Some(v) => *v,
-                None => return None,
-            };
-            data.immediate = data_first as u16;
+            if w_val && !s_val {
+                let data_first: u8 = match asm.pull_byte() {
+                    Some(v) => *v,
+                    None => return None,
+                };
+                let data_second: u8 = match asm.pull_byte() {
+                    Some(v) => *v,
+                    None => return None,
+                };
+
+                data.immediate = combine(data_first, data_second);
+            } else {
+                let data_first: u8 = match asm.pull_byte() {
+                    Some(v) => *v,
+                    None => return None,
+                };
+                data.immediate = data_first as u16;
+            }
         }
 
         _ => {
