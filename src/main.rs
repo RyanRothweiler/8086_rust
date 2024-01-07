@@ -24,7 +24,9 @@ impl Computer {
     }
 
     pub fn pull_byte(&mut self) -> Option<&u8> {
-        let ret = self.program.get(self.cpu.instruction_pointer);
+        let i : usize = usize::try_from(self.cpu.instruction_pointer).expect("Cannot convert instruction pointer to usize.");
+
+        let ret = self.program.get(i);
         self.cpu.instruction_pointer += 1;
         ret
     }

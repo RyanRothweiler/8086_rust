@@ -15,7 +15,7 @@ pub struct Cpu {
     di: i16,
 
     // todo remove this public?
-    pub instruction_pointer: usize,
+    pub instruction_pointer: i64,
 
     signed_flag: bool,
     zero_flag: bool,
@@ -59,6 +59,20 @@ impl Cpu {
 
     pub fn simulate(&mut self, command: Command) {
         match command.encoding {
+            Encoding::Jump(offset) => {
+                match command.instruction {
+                    Instruction::Jnz => {
+                        if !self.zero_flag {
+                            self.instruction_pointer += offset as i64;
+                        }
+                    }
+
+                    _ => {
+                        panic!("Unknown instruction");
+                    }
+                } 
+            }
+
             Encoding::ImmediateToReg(data) => {
                 self.set_register(&data.dest, data.immediate as i16);
             }
