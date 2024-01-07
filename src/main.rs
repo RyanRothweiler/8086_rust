@@ -2,13 +2,11 @@ use std::env;
 
 use std::io::stdin;
 
-//mod asm;
 mod command;
 mod encoding;
 mod parser;
 mod simulator;
 
-//use asm::*;
 use command::*;
 use encoding::*;
 
