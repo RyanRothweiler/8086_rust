@@ -5,6 +5,7 @@ use super::*;
 mod listing_0043;
 mod listing_0044;
 mod listing_0046;
+mod listing_0048;
 
 fn full_simulate(computer: &mut Computer) {
 
