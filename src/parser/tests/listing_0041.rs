@@ -1,7 +1,7 @@
 use crate::parser::tests::*;
 
 // the same commands are used for add / sub / cmp
-fn test_list(instruction: Instruction, asm: &mut Asm) {
+fn test_list(instruction: Instruction, computer: &mut Computer) {
     validate_next_command(
         Command {
             instruction: instruction.clone(),
@@ -14,7 +14,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -28,7 +28,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -38,7 +38,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 2,
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -48,7 +48,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 2,
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -58,7 +58,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 8,
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -72,7 +72,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -86,7 +86,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -100,7 +100,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -114,7 +114,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -128,7 +128,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Bx),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -142,7 +142,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Bx),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -156,7 +156,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Bx),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -170,7 +170,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Cx),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -184,7 +184,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Bh),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -198,7 +198,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Di),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -212,7 +212,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 34,
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -226,7 +226,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 29,
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -240,7 +240,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -254,7 +254,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 }),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -264,7 +264,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Bx),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -274,7 +274,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 source: Address::Register(Register::Ah),
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -284,7 +284,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 1000,
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -294,7 +294,7 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 226,
             }),
         },
-        asm,
+        computer,
     );
     validate_next_command(
         Command {
@@ -304,85 +304,85 @@ fn test_list(instruction: Instruction, asm: &mut Asm) {
                 immediate: 9,
             }),
         },
-        asm,
+        computer,
     );
 }
 #[test]
 fn listing_0041() {
-    let mut asm = Asm::new("resources/listings/listing_0041_add_sub_cmp_jnz");
-    test_list(Instruction::Add, &mut asm);
-    test_list(Instruction::Sub, &mut asm);
-    test_list(Instruction::Cmp, &mut asm);
+    let mut computer = Computer::new("resources/listings/listing_0041_add_sub_cmp_jnz");
+    test_list(Instruction::Add, &mut computer);
+    test_list(Instruction::Sub, &mut computer);
+    test_list(Instruction::Cmp, &mut computer);
 
     validate_next_command(
         Command {
             instruction: Instruction::Jnz,
             encoding: Encoding::Jump(2),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jnz,
             encoding: Encoding::Jump(-4),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jnz,
             encoding: Encoding::Jump(-6),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jnz,
             encoding: Encoding::Jump(-4),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Je,
             encoding: Encoding::Jump(-2),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jl,
             encoding: Encoding::Jump(-4),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jle,
             encoding: Encoding::Jump(-6),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jb,
             encoding: Encoding::Jump(-8),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jbe,
             encoding: Encoding::Jump(-10),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
             instruction: Instruction::Jp,
             encoding: Encoding::Jump(-12),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -390,7 +390,7 @@ fn listing_0041() {
             instruction: Instruction::Jo,
             encoding: Encoding::Jump(-14),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -398,7 +398,7 @@ fn listing_0041() {
             instruction: Instruction::Js,
             encoding: Encoding::Jump(-16),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -406,7 +406,7 @@ fn listing_0041() {
             instruction: Instruction::Jnz,
             encoding: Encoding::Jump(-18),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -414,7 +414,7 @@ fn listing_0041() {
             instruction: Instruction::Jnl,
             encoding: Encoding::Jump(-20),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -422,7 +422,7 @@ fn listing_0041() {
             instruction: Instruction::Jg,
             encoding: Encoding::Jump(-22),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -430,7 +430,7 @@ fn listing_0041() {
             instruction: Instruction::Jnb,
             encoding: Encoding::Jump(-24),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -438,7 +438,7 @@ fn listing_0041() {
             instruction: Instruction::Ja,
             encoding: Encoding::Jump(-26),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -446,7 +446,7 @@ fn listing_0041() {
             instruction: Instruction::Jnp,
             encoding: Encoding::Jump(-28),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -454,7 +454,7 @@ fn listing_0041() {
             instruction: Instruction::Jno,
             encoding: Encoding::Jump(-30),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -462,7 +462,7 @@ fn listing_0041() {
             instruction: Instruction::Jns,
             encoding: Encoding::Jump(-32),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -470,7 +470,7 @@ fn listing_0041() {
             instruction: Instruction::Loop,
             encoding: Encoding::Jump(-34),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -478,7 +478,7 @@ fn listing_0041() {
             instruction: Instruction::Loopz,
             encoding: Encoding::Jump(-36),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -486,7 +486,7 @@ fn listing_0041() {
             instruction: Instruction::Loopnz,
             encoding: Encoding::Jump(-38),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -494,6 +494,6 @@ fn listing_0041() {
             instruction: Instruction::Jcxz,
             encoding: Encoding::Jump(-40),
         },
-        &mut asm,
+        &mut computer,
     );
 }

@@ -8,7 +8,7 @@ mod listing_0039;
 mod listing_0041;
 mod listing_0046;
 
-fn validate_next_command(truth: Command, asm: &mut Asm) {
-    let command = parser::pull_command(asm).expect("Error pulling command");
+fn validate_next_command(truth: Command, computer: &mut Computer) {
+    let command = parser::pull_command(computer).expect("Error pulling command");
     assert_eq!(command, truth);
 }

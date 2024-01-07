@@ -2,7 +2,7 @@ use crate::parser::tests::*;
 
 #[test]
 fn listing_0039() {
-    let mut asm = Asm::new("resources/listings/listing_0039_more_movs");
+    let mut computer = Computer::new("resources/listings/listing_0039_more_movs");
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
@@ -11,7 +11,7 @@ fn listing_0039() {
                 dest: Address::Register(Register::Si),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -21,7 +21,7 @@ fn listing_0039() {
                 dest: Address::Register(Register::Dh),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -31,7 +31,7 @@ fn listing_0039() {
                 immediate: 12,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -41,7 +41,7 @@ fn listing_0039() {
                 immediate: 244,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -51,7 +51,7 @@ fn listing_0039() {
                 immediate: 12,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -61,7 +61,7 @@ fn listing_0039() {
                 immediate: 65524,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -71,7 +71,7 @@ fn listing_0039() {
                 immediate: 3948,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -81,7 +81,7 @@ fn listing_0039() {
                 immediate: 61588,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -95,7 +95,7 @@ fn listing_0039() {
                 }),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -109,7 +109,7 @@ fn listing_0039() {
                 }),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -123,7 +123,7 @@ fn listing_0039() {
                 }),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -137,7 +137,7 @@ fn listing_0039() {
                 }),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -151,7 +151,7 @@ fn listing_0039() {
                 }),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -165,7 +165,7 @@ fn listing_0039() {
                 source: Address::Register(Register::Cx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -179,7 +179,7 @@ fn listing_0039() {
                 source: Address::Register(Register::Cl),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -193,7 +193,7 @@ fn listing_0039() {
                 source: Address::Register(Register::Ch),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 }
 

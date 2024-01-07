@@ -2,7 +2,7 @@ use crate::parser::tests::*;
 
 #[test]
 fn listing_0037() {
-    let mut asm = Asm::new("resources/listings/listing_0037_single_register_mov");
+    let mut computer = Computer::new("resources/listings/listing_0037_single_register_mov");
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
@@ -11,6 +11,6 @@ fn listing_0037() {
                 dest: Address::Register(Register::Cx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 }

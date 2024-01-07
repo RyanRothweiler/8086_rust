@@ -2,15 +2,35 @@ use std::env;
 
 use std::io::stdin;
 
-mod asm;
+//mod asm;
 mod command;
 mod encoding;
 mod parser;
 mod simulator;
 
-use asm::*;
+//use asm::*;
 use command::*;
 use encoding::*;
+
+struct Computer {
+    cpu: simulator::Cpu,
+    program: Vec<u8>,
+}
+
+impl Computer {
+    fn new(prog_path: &str) -> Computer {
+        Computer {
+            cpu: simulator::Cpu::new(),
+            program: std::fs::read(prog_path).expect(&format!("Error reading file {prog_path}")),
+        }
+    }
+
+    pub fn pull_byte(&mut self) -> Option<&u8> {
+        let ret = self.program.get(self.cpu.instruction_pointer);
+        self.cpu.instruction_pointer += 1;
+        ret
+    }
+}
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
@@ -24,20 +44,18 @@ fn main() {
 
     // load file
     let file_path = &args[1];
-    let mut asm = Asm::new(file_path);
-    let mut cpu = simulator::Cpu::new();
+    let mut computer = Computer::new(file_path);
 
     // parse instructions
     loop {
-
-        let command = parser::pull_command(&mut asm);
+        let command = parser::pull_command(&mut computer);
         let command = match command {
             Some(v) => v,
             None => break,
         };
 
-        cpu.simulate(command);
-        cpu.print();
+        computer.cpu.simulate(command);
+        computer.cpu.print();
 
         let mut s = String::new();
         stdin().read_line(&mut s).unwrap();

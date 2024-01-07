@@ -6,8 +6,9 @@ use crate::*;
 mod tests;
 
 #[allow(unreachable_patterns)]
-pub fn pull_command(asm: &mut Asm) -> Option<Command> {
-    let first_byte: u8 = match asm.pull_byte() {
+pub fn pull_command(computer: &mut Computer) -> Option<Command> {
+
+    let first_byte: u8 = match computer.pull_byte() {
         Some(v) => *v,
         None => return None,
     };
@@ -16,7 +17,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
 
     match ret.encoding {
         Encoding::Jump(ref mut data) => {
-            let second_byte: u8 = match asm.pull_byte() {
+            let second_byte: u8 = match computer.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };
@@ -31,7 +32,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             if !w_val {
                 data.dest = Register::Al;
 
-                let second_byte: u8 = match asm.pull_byte() {
+                let second_byte: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
                 };
@@ -39,11 +40,11 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             } else {
                 data.dest = Register::Ax;
 
-                let second_byte: u8 = match asm.pull_byte() {
+                let second_byte: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
                 };
-                let third_byte: u8 = match asm.pull_byte() {
+                let third_byte: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
                 };
@@ -52,7 +53,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
         }
 
         Encoding::RegMemToRegMem(ref mut data) => {
-            let second_byte: u8 = match asm.pull_byte() {
+            let second_byte: u8 = match computer.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };
@@ -74,7 +75,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             let rm_val: u8 = (second_byte & rm_mask) << 5;
 
             // get results
-            let mod_results = match handle_mod(mod_val, reg_val, rm_val, w_val, asm) {
+            let mod_results = match handle_mod(mod_val, reg_val, rm_val, w_val, computer) {
                 Some(v) => v,
                 None => return None,
             };
@@ -90,7 +91,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
         }
 
         Encoding::ImmediateToReg(ref mut data) => {
-            let second_byte: u8 = match asm.pull_byte() {
+            let second_byte: u8 = match computer.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };
@@ -104,7 +105,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             data.dest = decode_register(reg_val, w_val);
 
             if w_val {
-                let third_byte: u8 = match asm.pull_byte() {
+                let third_byte: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
                 };
@@ -116,7 +117,7 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
         }
 
         Encoding::ImmediateToRegMem(ref mut data) => {
-            let second_byte: u8 = match asm.pull_byte() {
+            let second_byte: u8 = match computer.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };
@@ -157,25 +158,25 @@ pub fn pull_command(asm: &mut Asm) -> Option<Command> {
             }
 
             // get results
-            let mod_results = match handle_mod(mod_val, 0, rm_val, w_val, asm) {
+            let mod_results = match handle_mod(mod_val, 0, rm_val, w_val, computer) {
                 Some(v) => v,
                 None => return None,
             };
             data.dest = mod_results.rm_address;
 
             if w_val && !s_val {
-                let data_first: u8 = match asm.pull_byte() {
+                let data_first: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
                 };
-                let data_second: u8 = match asm.pull_byte() {
+                let data_second: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
                 };
 
                 data.immediate = combine(data_first, data_second);
             } else {
-                let data_first: u8 = match asm.pull_byte() {
+                let data_first: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
                 };
@@ -211,7 +212,7 @@ fn handle_mod(
     reg_val: u8,
     rm_val: u8,
     w_val: bool,
-    asm: &mut Asm,
+    computer: &mut Computer,
 ) -> Option<ModResults> {
     let mut results = ModResults {
         reg_address: Address::Register(Register::None),
@@ -303,7 +304,7 @@ fn handle_mod(
         // effective address calculation
         0b0100_0000 => {
             results.reg_address = Address::Register(decode_register(reg_val, w_val));
-            let offset: u8 = match asm.pull_byte() {
+            let offset: u8 = match computer.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };
@@ -382,11 +383,11 @@ fn handle_mod(
         // effective address calculation
         0b1000_0000 => {
             results.reg_address = Address::Register(decode_register(reg_val, w_val));
-            let low: u8 = match asm.pull_byte() {
+            let low: u8 = match computer.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };
-            let high: u8 = match asm.pull_byte() {
+            let high: u8 = match computer.pull_byte() {
                 Some(v) => *v,
                 None => return None,
             };

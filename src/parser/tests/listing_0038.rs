@@ -2,7 +2,7 @@ use crate::parser::tests::*;
 
 #[test]
 fn listing_0038() {
-    let mut asm = Asm::new("resources/listings/listing_0038_many_register_mov");
+    let mut computer = Computer::new("resources/listings/listing_0038_many_register_mov");
     validate_next_command(
         Command {
             instruction: Instruction::Mov,
@@ -11,7 +11,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Cx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -21,7 +21,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Ch),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -31,7 +31,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Dx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -41,7 +41,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Si),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -51,7 +51,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Bx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -61,7 +61,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Al),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -71,7 +71,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Ch),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -81,7 +81,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Bx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -91,7 +91,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Bx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -101,7 +101,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Sp),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
     validate_next_command(
         Command {
@@ -111,7 +111,7 @@ fn listing_0038() {
                 dest: Address::Register(Register::Bp),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 }
 

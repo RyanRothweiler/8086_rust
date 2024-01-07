@@ -2,7 +2,7 @@ use crate::parser::tests::*;
 
 #[test]
 fn listing_0046() {
-    let mut asm = Asm::new("resources/listings/listing_0046_add_sub_cmp");
+    let mut computer = Computer::new("resources/listings/listing_0046_add_sub_cmp");
 
     validate_next_command(
         Command {
@@ -12,7 +12,7 @@ fn listing_0046() {
                 immediate: (4093 * -1) as u16,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -23,7 +23,7 @@ fn listing_0046() {
                 immediate: 3841,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -34,7 +34,7 @@ fn listing_0046() {
                 source: Address::Register(Register::Cx),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -45,7 +45,7 @@ fn listing_0046() {
                 immediate: 998,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -56,7 +56,7 @@ fn listing_0046() {
                 immediate: 999,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -67,7 +67,7 @@ fn listing_0046() {
                 source: Address::Register(Register::Sp),
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -78,7 +78,7 @@ fn listing_0046() {
                 immediate: 1027,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
     validate_next_command(
@@ -89,7 +89,7 @@ fn listing_0046() {
                 immediate: 2026,
             }),
         },
-        &mut asm,
+        &mut computer,
     );
 
 }

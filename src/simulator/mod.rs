@@ -14,6 +14,9 @@ pub struct Cpu {
     si: i16,
     di: i16,
 
+    // todo remove this public?
+    pub instruction_pointer: usize,
+
     signed_flag: bool,
     zero_flag: bool,
 }
@@ -29,6 +32,8 @@ impl Cpu {
             bp: 0,
             si: 0,
             di: 0,
+
+            instruction_pointer: 0,
 
             signed_flag: false,
             zero_flag: false,

@@ -16,4 +16,8 @@ impl Asm {
         self.index += 1;
         ret
     }
+
+    pub fn set_instruction_pointer(&mut self, ip: usize) {
+        self.index = ip;
+    }
 }

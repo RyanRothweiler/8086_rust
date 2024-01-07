@@ -2,16 +2,16 @@ use crate::simulator::tests::*;
 
 #[test]
 fn listing_0043() {
-    let mut cpu = Cpu::new();
+    let mut computer = Computer::new("resources/listings/listing_0043_immediate_movs");
 
-    full_simulate("resources/listings/listing_0043_immediate_movs", &mut cpu);
+    full_simulate(&mut computer);
 
-    assert!(cpu.a == 1);
-    assert!(cpu.b == 2);
-    assert!(cpu.c == 3);
-    assert!(cpu.d == 4);
-    assert!(cpu.sp == 5);
-    assert!(cpu.bp == 6);
-    assert!(cpu.si == 7);
-    assert!(cpu.di == 8);
+    assert!(computer.cpu.a == 1);
+    assert!(computer.cpu.b == 2);
+    assert!(computer.cpu.c == 3);
+    assert!(computer.cpu.d == 4);
+    assert!(computer.cpu.sp == 5);
+    assert!(computer.cpu.bp == 6);
+    assert!(computer.cpu.si == 7);
+    assert!(computer.cpu.di == 8);
 }
