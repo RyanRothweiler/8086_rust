@@ -5,6 +5,7 @@ pub struct EffectiveAddress {
     pub first_operand: Register,
     pub second_operand: Register,
     pub offset: u16,
+    pub direct: usize,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]

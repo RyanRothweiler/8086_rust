@@ -7,7 +7,6 @@ mod tests;
 
 #[allow(unreachable_patterns)]
 pub fn pull_command(computer: &mut Computer) -> Option<Command> {
-
     let first_byte: u8 = match computer.pull_byte() {
         Some(v) => *v,
         None => return None,
@@ -138,22 +137,27 @@ pub fn pull_command(computer: &mut Computer) -> Option<Command> {
             let mod_val: u8 = second_byte & mod_mask;
             let operation_val: u8 = (second_byte & operation_mask) << 2;
 
-            // set operation
-            match operation_val {
-                0b0000_0000 => {
-                    ret.instruction = Instruction::Add;
-                }
+            // Set Operation
+            // Slightly weird logic here. The mov version of this uses the same operation_val as
+            // add. So mov is set in the decode_instruction step. All the other versions are set to
+            // Register::None
+            if ret.instruction == Instruction::None {
+                match operation_val {
+                    0b0000_0000 => {
+                        ret.instruction = Instruction::Add;
+                    }
 
-                0b1010_0000 => {
-                    ret.instruction = Instruction::Sub;
-                }
+                    0b1010_0000 => {
+                        ret.instruction = Instruction::Sub;
+                    }
 
-                0b1110_0000 => {
-                    ret.instruction = Instruction::Cmp;
-                }
+                    0b1110_0000 => {
+                        ret.instruction = Instruction::Cmp;
+                    }
 
-                _ => {
-                    panic!("Unknown operation");
+                    _ => {
+                        panic!("Unknown operation");
+                    }
                 }
             }
 
@@ -164,7 +168,14 @@ pub fn pull_command(computer: &mut Computer) -> Option<Command> {
             };
             data.dest = mod_results.rm_address;
 
-            if w_val && !s_val {
+            let mut do_wide: bool = w_val && !s_val;
+
+            // Mov version doesn't use the s_val
+            if ret.instruction == Instruction::Mov {
+                do_wide = w_val;
+            }
+
+            if do_wide {
                 let data_first: u8 = match computer.pull_byte() {
                     Some(v) => *v,
                     None => return None,
@@ -185,7 +196,8 @@ pub fn pull_command(computer: &mut Computer) -> Option<Command> {
         }
 
         _ => {
-            panic!("Unknown instruction");
+            dbg!(ret);
+            panic!("Unknown encoding");
         }
     }
 
@@ -244,6 +256,7 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::Si,
                         offset: 0,
+                        direct: 0,
                     });
                 }
 
@@ -252,6 +265,7 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::Di,
                         offset: 0,
+                        direct: 0,
                     });
                 }
 
@@ -260,6 +274,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::Si,
                         offset: 0,
+                        direct: 0,
                     });
                 }
 
@@ -268,6 +283,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::Di,
                         offset: 0,
+                        direct: 0,
                     });
                 }
 
@@ -276,6 +292,7 @@ fn handle_mod(
                         first_operand: Register::Si,
                         second_operand: Register::None,
                         offset: 0,
+                        direct: 0,
                     });
                 }
 
@@ -284,6 +301,7 @@ fn handle_mod(
                         first_operand: Register::Di,
                         second_operand: Register::None,
                         offset: 0,
+                        direct: 0,
                     });
                 }
 
@@ -292,10 +310,31 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::None,
                         offset: 0,
+                        direct: 0,
+                    });
+                }
+
+                // Direct address special case
+                0b1100_0000 => {
+                    let data_first: u8 = match computer.pull_byte() {
+                        Some(v) => *v,
+                        None => return None,
+                    };
+                    let data_second: u8 = match computer.pull_byte() {
+                        Some(v) => *v,
+                        None => return None,
+                    };
+
+                    results.rm_address = Address::EffectiveAddress(EffectiveAddress {
+                        first_operand: Register::None,
+                        second_operand: Register::None,
+                        offset: 0,
+                        direct: usize::from(combine(data_first, data_second)),
                     });
                 }
 
                 _ => {
+                    println!("{rm_val:#8b}");
                     panic!("Unknown effective address source val");
                 }
             };
@@ -315,6 +354,7 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::Si,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
@@ -323,6 +363,7 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::Di,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
@@ -331,6 +372,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::Si,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
@@ -339,6 +381,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::Di,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
@@ -347,6 +390,7 @@ fn handle_mod(
                         first_operand: Register::Si,
                         second_operand: Register::None,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
@@ -355,6 +399,7 @@ fn handle_mod(
                         first_operand: Register::Di,
                         second_operand: Register::None,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
@@ -363,6 +408,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::None,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
@@ -371,10 +417,12 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::None,
                         offset: offset as u16,
+                        direct: 0,
                     });
                 }
 
                 _ => {
+                    println!("{rm_val:#8b}");
                     panic!("Unknown effective address source val");
                 }
             };
@@ -400,6 +448,7 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::Si,
                         offset: offset,
+                        direct: 0,
                     });
                 }
 
@@ -408,6 +457,7 @@ fn handle_mod(
                         first_operand: Register::Bx,
                         second_operand: Register::Di,
                         offset: offset,
+                        direct: 0,
                     });
                 }
 
@@ -416,6 +466,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::Si,
                         offset: offset,
+                        direct: 0,
                     });
                 }
 
@@ -424,6 +475,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::Di,
                         offset: offset,
+                        direct: 0,
                     });
                 }
 
@@ -432,6 +484,7 @@ fn handle_mod(
                         first_operand: Register::Si,
                         second_operand: Register::None,
                         offset: offset,
+                        direct: 0,
                     });
                 }
 
@@ -440,6 +493,7 @@ fn handle_mod(
                         first_operand: Register::Di,
                         second_operand: Register::None,
                         offset: offset,
+                        direct: 0,
                     });
                 }
 
@@ -448,6 +502,7 @@ fn handle_mod(
                         first_operand: Register::Bp,
                         second_operand: Register::None,
                         offset: offset,
+                        direct: 0,
                     });
                 }
 
@@ -455,11 +510,13 @@ fn handle_mod(
                     results.rm_address = Address::EffectiveAddress(EffectiveAddress {
                         first_operand: Register::Bx,
                         second_operand: Register::None,
-                        offset: offset,
+                        offset: 0,
+                        direct: usize::from(offset),
                     });
                 }
 
                 _ => {
+                    println!("{rm_val:#8b}");
                     panic!("Unknown effective address source val");
                 }
             };
@@ -481,10 +538,13 @@ struct CommandMask {
 const REG_MEM_TO_REG_MEM_MASK: u8 = 0b_1111_1100;
 const IMMEDIATE_REG_MASK: u8 = 0b_1111_0000;
 const ASC_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1100;
+const MOV_IMMEDIATE_REG_MEM_MASK: u8 = 0b_1111_1110;
 const ASC_IMMEDIATE_ACCUMULATOR_MASK: u8 = 0b_1111_1110;
 const JMP_MASK: u8 = 0b_1111_1111;
 
-static COMMAND_MASKS: [CommandMask; 29] = [
+//0b_1100_0111
+
+static COMMAND_MASKS: [CommandMask; 30] = [
     CommandMask {
         mask: JMP_MASK,
         instruction_value: 0b_1110_0011,
@@ -690,10 +750,21 @@ static COMMAND_MASKS: [CommandMask; 29] = [
         },
     },
     CommandMask {
+        mask: MOV_IMMEDIATE_REG_MEM_MASK,
+        instruction_value: 0b_1100_0110,
+        command: Command {
+            instruction: Instruction::Mov,
+            encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
+                immediate: 0,
+                dest: Address::Register(Register::None),
+            }),
+        },
+    },
+    CommandMask {
         mask: ASC_IMMEDIATE_REG_MEM_MASK,
         instruction_value: 0b_1000_0000,
         command: Command {
-            instruction: Instruction::Mov,
+            instruction: Instruction::None,
             encoding: Encoding::ImmediateToRegMem(ImmediateToRegMem {
                 immediate: 0,
                 dest: Address::Register(Register::None),

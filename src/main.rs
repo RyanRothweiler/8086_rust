@@ -10,9 +10,11 @@ mod simulator;
 use command::*;
 use encoding::*;
 
+#[allow(dead_code)]
 struct Computer {
     cpu: simulator::Cpu,
     program: Vec<u8>,
+    memory: [i16; 2000],
 }
 
 impl Computer {
@@ -20,6 +22,7 @@ impl Computer {
         Computer {
             cpu: simulator::Cpu::new(),
             program: std::fs::read(prog_path).expect(&format!("Error reading file {prog_path}")),
+            memory: [0; 2000],
         }
     }
 
@@ -29,6 +32,10 @@ impl Computer {
         let ret = self.program.get(i);
         self.cpu.instruction_pointer += 1;
         ret
+    }
+
+    pub fn simulate(&mut self, command: Command) { 
+        self.cpu.simulate(command, &mut self.memory);
     }
 }
 
@@ -54,7 +61,7 @@ fn main() {
             None => break,
         };
 
-        computer.cpu.simulate(command);
+        computer.simulate(command);
         computer.cpu.print();
 
         let mut s = String::new();

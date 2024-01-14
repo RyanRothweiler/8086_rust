@@ -7,6 +7,7 @@ mod listing_0044;
 mod listing_0046;
 mod listing_0048;
 mod listing_0049;
+//mod listing_0051;
 
 fn full_simulate(computer: &mut Computer) {
 
@@ -18,7 +19,7 @@ fn full_simulate(computer: &mut Computer) {
             None => break,
         };
 
-        computer.cpu.simulate(command);
+        computer.simulate(command);
     }
 }
 
@@ -29,5 +30,5 @@ fn sim_one(computer: &mut Computer) {
         None => panic!("Ran out of commands"),
     };
 
-    computer.cpu.simulate(command);
+    computer.simulate(command);
 }
