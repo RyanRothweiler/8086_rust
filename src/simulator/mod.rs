@@ -77,7 +77,7 @@ impl Cpu {
 
             Encoding::ImmediateToRegMem(reg_mem) => match command.instruction {
                 Instruction::Mov => {
-                    self.mov_address_immediate(reg_mem.dest, reg_mem.immediate as i16, memory);
+                    self.effective_address_set(&reg_mem.dest, reg_mem.immediate as i16, memory);
                 }
 
                 Instruction::Cmp => {
@@ -85,11 +85,21 @@ impl Cpu {
                 }
 
                 Instruction::Sub => {
-                    self.sub_address(reg_mem.dest, reg_mem.immediate as i16);
+                    let current: i16 = self.effective_address_get(&reg_mem.dest, memory);
+                    self.effective_address_set(
+                        &reg_mem.dest,
+                        current - reg_mem.immediate as i16,
+                        memory,
+                    );
                 }
 
                 Instruction::Add => {
-                    self.add_address(reg_mem.dest, reg_mem.immediate as i16);
+                    let dest_val: i16 = self.effective_address_get(&reg_mem.dest, memory);
+                    self.effective_address_set(
+                        &reg_mem.dest,
+                        dest_val + reg_mem.immediate as i16,
+                        memory,
+                    );
                 }
 
                 _ => {
@@ -98,45 +108,38 @@ impl Cpu {
                 }
             },
 
-            Encoding::RegMemToRegMem(reg_mem) => {
-                let dest: Register = match reg_mem.dest {
-                    Address::Register(d) => d,
-                    _ => {
-                        panic!("Unimplemented address")
-                    }
-                };
-
-                let source: Register = match reg_mem.source {
-                    Address::Register(d) => d,
-                    _ => {
-                        panic!("Unimplemented address")
-                    }
-                };
-
-                match command.instruction {
-                    Instruction::Mov => {
-                        let val = self.get_value(&source);
-                        self.set_register(&dest, val);
-                    }
-                    Instruction::Cmp => {
-                        let source_val = self.get_value(&source);
-                        let dest_val = self.get_value(&dest);
-                        self.update_flags(dest_val - source_val);
-                    }
-                    Instruction::Sub => {
-                        let source_val = self.get_value(&source);
-                        self.sub(dest, source_val);
-                    }
-                    Instruction::Add => {
-                        let source_val = self.get_value(&source);
-                        self.add(dest, source_val);
-                    }
-                    _ => {
-                        dbg!(command.instruction);
-                        panic!("Unknown instruction.");
-                    }
+            Encoding::RegMemToRegMem(reg_mem) => match command.instruction {
+                Instruction::Mov => {
+                    let val: i16 = self.effective_address_get(&reg_mem.source, memory);
+                    self.effective_address_set(&reg_mem.dest, val, memory);
                 }
-            }
+
+                Instruction::Cmp => {
+                    let source_val: i16 = self.effective_address_get(&reg_mem.source, memory);
+                    let dest_val: i16 = self.effective_address_get(&reg_mem.dest, memory);
+                    self.update_flags(dest_val - source_val);
+                }
+
+                Instruction::Sub => {
+                    let source_val: i16 = self.effective_address_get(&reg_mem.source, memory);
+                    let dest_val: i16 = self.effective_address_get(&reg_mem.dest, memory);
+
+                    self.effective_address_set(&reg_mem.dest, dest_val - source_val, memory);
+                }
+
+                Instruction::Add => {
+                    let source_val: i16 = self.effective_address_get(&reg_mem.source, memory);
+                    let dest_val: i16 = self.effective_address_get(&reg_mem.dest, memory);
+
+                    self.effective_address_set(&reg_mem.dest, dest_val + source_val, memory);
+                }
+
+                _ => {
+                    dbg!(command.instruction);
+                    panic!("Unknown instruction.");
+                }
+            },
+
             _ => {
                 dbg!(command.encoding);
                 panic!("Unknwon encoding");
@@ -181,67 +184,53 @@ impl Cpu {
         self.zero_flag = val == 0;
     }
 
-    fn add(&mut self, dest: Register, value: i16) {
-        let curr: i16 = self.get_value(&dest);
-        let new_val = curr + value;
-        self.set_register(&dest, new_val);
-        self.update_flags(new_val);
-    }
-
-    fn sub(&mut self, dest: Register, value: i16) {
-        let curr: i16 = self.get_value(&dest);
-        let new_val = curr - value;
-        self.set_register(&dest, new_val);
-        self.update_flags(new_val);
-    }
-
-    fn sub_address(&mut self, dest: Address, value: i16) {
-        match dest {
-            Address::Register(reg) => {
-                self.sub(reg, value);
-            }
-
-            _ => {
-                panic!("Unimplemented address type");
-            }
-        }
-    }
-
-    fn add_address(&mut self, dest: Address, value: i16) {
-        match dest {
-            Address::Register(reg) => {
-                self.add(reg, value);
-            }
-
-            _ => {
-                panic!("Unimplemented address type");
-            }
-        }
-    }
-
-    fn mov_address_immediate(&mut self, dest: Address, value: i16, memory: &mut [i16; 2000]) {
+    fn effective_address_set(&mut self, dest: &Address, value: i16, memory: &mut [i16; 2000]) {
         match dest {
             Address::Register(dest_reg) => {
                 self.set_register(&dest_reg, value);
             }
 
             Address::EffectiveAddress(ea) => {
-
-                let mut first_val: u16 = 0;
-                if ea.first_operand != Register::None {
-                    first_val = self.get_value(&ea.first_operand) as u16;
-                }
-
-                let mut second_val: u16 = 0;
-                if ea.second_operand != Register::None {
-                    second_val = self.get_value(&ea.second_operand) as u16;
-                }
-
-                let memory_address : u16 = first_val + second_val + ea.offset;
-                memory[usize::from(memory_address)] = value;
+                let address = self.effective_address_resolve(ea);
+                memory[address as usize] = value;
                 //self.update_flags();
             }
         }
+
+        self.update_flags(value);
+    }
+
+    fn effective_address_get(&mut self, dest: &Address, memory: &mut [i16; 2000]) -> i16 {
+        match dest {
+            Address::Register(reg) => {
+                return self.get_value(&reg);
+            }
+
+            Address::EffectiveAddress(ea) => {
+                let address = self.effective_address_resolve(ea);
+                return memory[address as usize];
+            }
+        }
+    }
+
+    fn effective_address_resolve(&self, ea: &EffectiveAddress) -> i16 {
+        // If we have a direct address then use that
+        if ea.direct != 0 {
+            return ea.direct as i16;
+        }
+
+        // calculate operands
+        let mut first_val: u16 = 0;
+        if ea.first_operand != Register::None {
+            first_val = self.get_value(&ea.first_operand) as u16;
+        }
+
+        let mut second_val: u16 = 0;
+        if ea.second_operand != Register::None {
+            second_val = self.get_value(&ea.second_operand) as u16;
+        }
+
+        return (first_val + second_val + ea.offset) as i16;
     }
 
     fn cmp(&mut self, dest: Address, value: i16) {

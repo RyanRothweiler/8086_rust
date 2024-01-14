@@ -7,7 +7,7 @@ mod listing_0044;
 mod listing_0046;
 mod listing_0048;
 mod listing_0049;
-//mod listing_0051;
+mod listing_0051;
 
 fn full_simulate(computer: &mut Computer) {
 
